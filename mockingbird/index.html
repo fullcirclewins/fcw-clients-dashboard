@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creator Connections · Affiliate Performance · FCW × Mockingbird</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.8.0/Recharts.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: #F2EDE6; font-family: 'Jost', sans-serif; }
+    #root { min-height: 100vh; }
+
+    .tab-btn { cursor: pointer; transition: all 0.2s ease; }
+    .tab-btn:hover { background: #E8E0D4 !important; border-color: #C4A265 !important; color: #9B7A3E !important; }
+    .creator-row { transition: background 0.1s; }
+    .creator-row:hover { background: #E8E0D4 !important; }
+    .insight-card { transition: box-shadow 0.2s; }
+    .insight-card:hover { box-shadow: 0 8px 28px rgba(155,122,62,0.14) !important; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState } = React;
+const {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, LineChart, Line, Cell
+} = Recharts;
+
+const GOLD       = "#9B7A3E";
+const GOLD_LIGHT = "#C4A265";
+const CREAM      = "#F2EDE6";
+const CREAM_DARK = "#E8E0D4";
+const WARM_WHITE = "#FAF7F3";
+const TEXT_DARK  = "#2C2416";
+const TEXT_MID   = "#6B5B3E";
+const TEXT_LIGHT = "#9E8B6F";
+const BORDER     = "#DDD5C4";
+
+const creatorData = [
+  { name: "Babylist",           spend: 3260.25, clicks: 857,   orders: 57, sales: 32602.50, cvr: 6.65, cpc: 3.80 },
+  { name: "Parents",            spend:  575.00, clicks: 1659,  orders: 10, sales:  5750.00, cvr: 0.60, cpc: 0.35 },
+  { name: "Roundforest",        spend:  172.50, clicks: 264,   orders:  3, sales:  1725.00, cvr: 1.14, cpc: 0.65 },
+  { name: "Brainjolt Media",    spend:  146.63, clicks:   0,   orders:  3, sales:  1466.25, cvr: null, cpc: null },
+  { name: "Real Simple",        spend:  115.00, clicks:   0,   orders:  2, sales:  1150.00, cvr: null, cpc: null },
+  { name: "SweetSavings",       spend:  106.38, clicks:   0,   orders:  2, sales:  1063.76, cvr: null, cpc: null },
+  { name: "Best Choice",        spend:  106.38, clicks:  47,   orders:  2, sales:  1063.75, cvr: 4.26, cpc: 2.26 },
+  { name: "KristinaAdams",      spend:   57.50, clicks:   0,   orders:  1, sales:   575.00, cvr: null, cpc: null },
+  { name: "thebargainsisters",  spend:   57.50, clicks:   0,   orders:  1, sales:   575.00, cvr: null, cpc: null },
+  { name: "Nate",               spend:   57.50, clicks:   0,   orders:  1, sales:   575.00, cvr: null, cpc: null },
+  { name: "The Knot",           spend:   57.50, clicks:   0,   orders:  1, sales:   575.00, cvr: null, cpc: null },
+  { name: "What to Expect",     spend:   48.88, clicks: 491,   orders:  1, sales:   488.75, cvr: 0.20, cpc: 0.10 },
+  { name: "Forbes",             spend:   48.88, clicks:   0,   orders:  1, sales:   488.75, cvr: null, cpc: null },
+  { name: "Katy Birkelbach",    spend:    0.00, clicks:10460,  orders:  0, sales:     0.00, cvr:    0, cpc: null },
+  { name: "Consumer Echo",      spend:    0.00, clicks:  68,   orders:  0, sales:     0.00, cvr:    0, cpc: null },
+  { name: "DisneyFoodBlog",     spend:    0.00, clicks:  34,   orders:  0, sales:     0.00, cvr:    0, cpc: null },
+  { name: "Market.com!",        spend:    0.00, clicks:  25,   orders:  0, sales:     0.00, cvr:    0, cpc: null },
+  { name: "BuzzFeed",           spend:    0.00, clicks:  11,   orders:  0, sales:     0.00, cvr:    0, cpc: null },
+];
+
+const dailyData = [
+  { date:"Sep 15", sales:1063.75, orders:2 }, { date:"Sep 17", sales:1638.75, orders:3 },
+  { date:"Sep 18", sales:1150.00, orders:2 }, { date:"Sep 19", sales: 575.00, orders:1 },
+  { date:"Sep 24", sales:1150.00, orders:2 }, { date:"Sep 25", sales: 575.00, orders:1 },
+  { date:"Sep 26", sales:1063.76, orders:2 }, { date:"Sep 28", sales:2213.75, orders:4 },
+  { date:"Sep 29", sales:1150.00, orders:2 }, { date:"Sep 30", sales: 575.00, orders:1 },
+  { date:"Oct 1",  sales: 575.00, orders:1 }, { date:"Oct 2",  sales:1150.00, orders:2 },
+  { date:"Oct 5",  sales:1150.00, orders:2 }, { date:"Oct 6",  sales:1725.00, orders:3 },
+  { date:"Oct 9",  sales:4513.75, orders:8 }, { date:"Oct 10", sales:1725.00, orders:3 },
+  { date:"Oct 12", sales: 575.00, orders:1 }, { date:"Oct 13", sales:1725.00, orders:3 },
+  { date:"Oct 14", sales:1150.00, orders:2 }, { date:"Oct 15", sales: 575.00, orders:1 },
+  { date:"Oct 16", sales: 488.75, orders:1 }, { date:"Oct 18", sales:1150.00, orders:2 },
+  { date:"Oct 20", sales: 575.00, orders:1 }, { date:"Oct 22", sales:1638.75, orders:3 },
+  { date:"Oct 23", sales: 575.00, orders:1 }, { date:"Oct 24", sales:1150.00, orders:2 },
+  { date:"Oct 26", sales:1725.00, orders:3 }, { date:"Oct 27", sales: 488.75, orders:1 },
+  { date:"Oct 28", sales: 575.00, orders:1 }, { date:"Oct 31", sales:1638.75, orders:3 },
+  { date:"Nov 2",  sales: 575.00, orders:1 }, { date:"Nov 4",  sales:2300.00, orders:4 },
+  { date:"Nov 5",  sales:1150.00, orders:2 }, { date:"Nov 9",  sales:1725.00, orders:3 },
+  { date:"Nov 10", sales:1150.00, orders:2 }, { date:"Nov 12", sales:1150.00, orders:2 },
+  { date:"Nov 13", sales: 575.00, orders:1 }, { date:"Nov 17", sales:1150.00, orders:2 },
+  { date:"Nov 19", sales: 575.00, orders:1 }, { date:"Nov 20", sales:1725.00, orders:3 },
+];
+
+const fmt$     = n => n >= 1000 ? `$${(n/1000).toFixed(1)}k` : `$${n.toFixed(0)}`;
+const fmtFull$ = n => `$${n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+
+const s = (obj) => obj; // passthrough for inline styles
+
+function CustomTooltip({ active, payload, label }) {
+  if (!active || !payload || !payload.length) return null;
+  return (
+    <div style={{background:WARM_WHITE,border:`1px solid ${BORDER}`,borderRadius:6,padding:"10px 14px",boxShadow:"0 4px 16px rgba(44,36,22,0.12)"}}>
+      <p style={{color:TEXT_LIGHT,fontSize:11,marginBottom:4,fontFamily:"'Jost',sans-serif"}}>{label}</p>
+      {payload.map((p,i) => (
+        <p key={i} style={{color:GOLD,fontSize:13,fontWeight:600,fontFamily:"'Cormorant Garamond',serif"}}>
+          {p.name==="sales"||p.name==="Sales" ? fmtFull$(p.value) : p.value}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+function Dashboard() {
+  const [activeTab, setActiveTab] = useState("overview");
+  const converters = creatorData.filter(c => c.orders > 0).sort((a,b) => b.sales - a.sales);
+
+  const kpis = [
+    { label:"Total Sales",          value:"$48,099",  sub:"10% commission basis",  highlight:true  },
+    { label:"Total Spend",          value:"$4,810",   sub:"of $5,000 budget",      highlight:false },
+    { label:"ROAS",                 value:"10.0×",    sub:"return on ad spend",    highlight:true  },
+    { label:"Orders",               value:"85",       sub:"avg $566 AOV",          highlight:false },
+    { label:"Total Clicks",         value:"14,025",   sub:"$0.34 avg CPC",         highlight:false },
+    { label:"Converting Creators",  value:"13 / 38",  sub:"34% of roster",         highlight:false },
+  ];
+
+  const insights = [
+    { label:"Top Performer",    title:"Babylist",               accent:GOLD,
+      body:"Drove 68% of total revenue ($32,602) with 57 orders and a 6.65% CVR — the clear standout of the campaign. Strong candidate for a dedicated or exclusive arrangement going forward." },
+    { label:"Watch List",       title:"High Clicks, No Sales",  accent:"#B05A5A",
+      body:"Katy Birkelbach sent 10,460 clicks with zero conversions. Parents drove 1,659 clicks at only 0.6% CVR. Likely an audience mismatch or content and landing page misalignment worth investigating." },
+    { label:"Attribution Note", title:"Zero-Click Converters",  accent:GOLD_LIGHT,
+      body:"Brainjolt, Real Simple, SweetSavings, and 5 others recorded sales with no tracked clicks — likely newsletter or organic-driven. Valuable reach that doesn't surface in click data." },
+  ];
+
+  const tierConfig = (c) => {
+    if (c.sales > 5000)     return { tier:"A", tierBg:"#F5EFE4", tierColor:GOLD };
+    if (c.sales > 1000)     return { tier:"B", tierBg:"#F0EDE6", tierColor:GOLD_LIGHT };
+    if (c.sales > 0)        return { tier:"C", tierBg:CREAM,     tierColor:TEXT_MID };
+    if (c.clicks > 100)     return { tier:"D", tierBg:"#F9EDED", tierColor:"#B05A5A" };
+    return                         { tier:"F", tierBg:CREAM,     tierColor:TEXT_LIGHT };
+  };
+
+  return (
+    <div style={{minHeight:"100vh",background:CREAM}}>
+
+      {/* ── HEADER ── */}
+      <div style={{background:WARM_WHITE,borderBottom:`1px solid ${BORDER}`,padding:"28px 48px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div>
+          <div style={{fontFamily:"'Jost',sans-serif",fontSize:10,color:TEXT_LIGHT,letterSpacing:"0.2em",textTransform:"uppercase",marginBottom:6}}>FCW × Mockingbird</div>
+          <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:30,fontWeight:700,color:TEXT_DARK,lineHeight:1.1}}>Creator Connections</div>
+          <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:30,fontWeight:400,color:GOLD,lineHeight:1.2}}>Affiliate Performance Report</div>
+        </div>
+        <div style={{textAlign:"right"}}>
+          <div style={{fontFamily:"'Jost',sans-serif",fontSize:11,color:TEXT_LIGHT,marginBottom:3}}>Sep – Nov 2025</div>
+          <div style={{fontFamily:"'Jost',sans-serif",fontSize:11,color:TEXT_LIGHT,marginBottom:3}}>Mockingbird Single-to-Double Stroller 2.0</div>
+          <div style={{fontFamily:"'Jost',sans-serif",fontSize:11,color:TEXT_LIGHT,marginBottom:10}}>38 Creators · 10% Commission · $5,000 Budget</div>
+          <div style={{display:"inline-block",background:"#F9EDED",border:"1px solid #DDBCBC",borderRadius:4,padding:"4px 14px"}}>
+            <span style={{fontFamily:"'Jost',sans-serif",fontSize:10,color:"#B05A5A",letterSpacing:"0.1em",textTransform:"uppercase"}}>Campaign Ended</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── KPI STRIP ── */}
+      <div style={{background:WARM_WHITE,borderBottom:`1px solid ${BORDER}`,display:"grid",gridTemplateColumns:"repeat(6,1fr)"}}>
+        {kpis.map((k,i) => (
+          <div key={i} style={{padding:"22px 28px",borderRight:i<5?`1px solid ${BORDER}`:"none",background:k.highlight?"#F5EFE4":WARM_WHITE}}>
+            <div style={{fontFamily:"'Jost',sans-serif",fontSize:10,color:TEXT_LIGHT,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:8}}>{k.label}</div>
+            <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:k.highlight?26:22,fontWeight:600,color:k.highlight?GOLD:TEXT_DARK}}>{k.value}</div>
+            <div style={{fontFamily:"'Jost',sans-serif",fontSize:10,color:TEXT_LIGHT,marginTop:4}}>{k.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── TABS ── */}
+      <div style={{background:CREAM_DARK,borderBottom:`1px solid ${BORDER}`,display:"flex",padding:"12px 48px",gap:10}}>
+        {["Overview","Creators","Timeline"].map(tab => {
+          const active = activeTab === tab.toLowerCase();
+          return (
+            <button key={tab} className="tab-btn" onClick={() => setActiveTab(tab.toLowerCase())} style={{
+              background:active?GOLD:WARM_WHITE,
+              border:`1px solid ${active?GOLD:BORDER}`,
+              borderRadius:6,
+              color:active?"#FAF7F3":TEXT_MID,
+              padding:"10px 28px",
+              fontSize:11,
+              fontFamily:"'Jost',sans-serif",
+              letterSpacing:"0.14em",
+              textTransform:"uppercase",
+              fontWeight:500,
+              boxShadow:active?"0 2px 8px rgba(155,122,62,0.25)":"none",
+            }}>{tab}</button>
+          );
+        })}
+      </div>
+
+      {/* ── CONTENT ── */}
+      <div style={{padding:"36px 48px"}}>
+
+        {/* OVERVIEW */}
+        {activeTab === "overview" && (
+          <div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:24,marginBottom:24}}>
+              {/* Sales chart */}
+              <div className="insight-card" style={{background:WARM_WHITE,border:`1px solid ${BORDER}`,borderRadius:8,padding:28,boxShadow:"0 2px 12px rgba(44,36,22,0.05)"}}>
+                <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:17,fontWeight:600,color:TEXT_DARK,marginBottom:3}}>Sales by Creator</div>
+                <div style={{fontFamily:"'Jost',sans-serif",fontSize:10,color:TEXT_LIGHT,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:20}}>Top performers by revenue generated</div>
+                <ResponsiveContainer width="100%" height={230}>
+                  <BarChart data={converters.slice(0,8)} layout="vertical" margin={{left:0,right:16}}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={CREAM_DARK} horizontal={false} />
+                    <XAxis type="number" tickFormatter={fmt$} tick={{fontSize:10,fill:TEXT_LIGHT,fontFamily:"Jost,sans-serif"}} axisLine={false} tickLine={false} />
+                    <YAxis type="category" dataKey="name" tick={{fontSize:10,fill:TEXT_MID,fontFamily:"Jost,sans-serif"}} axisLine={false} tickLine={false} width={105} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Bar dataKey="sales" name="Sales" radius={[0,3,3,0]}>
+                      {converters.slice(0,8).map((_,i) => <Cell key={i} fill={i===0?GOLD:i===1?GOLD_LIGHT:CREAM_DARK} />)}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Orders chart */}
+              <div className="insight-card" style={{background:WARM_WHITE,border:`1px solid ${BORDER}`,borderRadius:8,padding:28,boxShadow:"0 2px 12px rgba(44,36,22,0.05)"}}>
+                <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:17,fontWeight:600,color:TEXT_DARK,marginBottom:3}}>Orders by Creator</div>
+                <div style={{fontFamily:"'Jost',sans-serif",fontSize:10,color:TEXT_LIGHT,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:20}}>Units driven per partner</div>
+                <ResponsiveContainer width="100%" height={230}>
+                  <BarChart data={converters.slice(0,8)} layout="vertical" margin={{left:0,right:16}}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={CREAM_DARK} horizontal={false} />
+                    <XAxis type="number" tick={{fontSize:10,fill:TEXT_LIGHT,fontFamily:"Jost,sans-serif"}} axisLine={false} tickLine={false} />
+                    <YAxis type="category" dataKey="name" tick={{fontSize:10,fill:TEXT_MID,fontFamily:"Jost,sans-serif"}} axisLine={false} tickLine={false} width={105} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Bar dataKey="orders" name="Orders" radius={[0,3,3,0]}>
+                      {converters.slice(0,8).map((_,i) => <Cell key={i} fill={i===0?GOLD:i===1?GOLD_LIGHT:CREAM_DARK} />)}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Insight cards */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:20}}>
+              {insights.map((card,i) => (
+                <div key={i} className="insight-card" style={{background:WARM_WHITE,border:`1px solid ${BORDER}`,borderTop:`3px solid ${card.accent}`,borderRadius:8,padding:24,boxShadow:"0 2px 12px rgba(44,36,22,0.05)"}}>
+                  <div style={{fontFamily:"'Jost',sans-serif",fontSize:10,color:card.accent,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:8}}>{card.label}</div>
+                  <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:19,fontWeight:600,color:TEXT_DARK,marginBottom:12}}>{card.title}</div>
+                  <div style={{fontFamily:"'Jost',sans-serif",fontSize:12,color:TEXT_MID,lineHeight:1.75}}>{card.body}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* CREATORS */}
+        {activeTab === "creators" && (
+          <div>
+            <div style={{background:WARM_WHITE,border:`1px solid ${BORDER}`,borderRadius:8,overflow:"hidden",boxShadow:"0 2px 12px rgba(44,36,22,0.05)"}}>
+              <div style={{display:"grid",gridTemplateColumns:"190px 1fr 1fr 1fr 1fr 1fr 1fr 80px",padding:"14px 24px",borderBottom:`1px solid ${BORDER}`,background:CREAM}}>
+                {["Creator","Sales","Spend","Orders","Clicks","CVR","CPC","Tier"].map(h => (
+                  <div key={h} style={{fontFamily:"'Jost',sans-serif",fontSize:10,color:TEXT_LIGHT,letterSpacing:"0.1em",textTransform:"uppercase"}}>{h}</div>
+                ))}
+              </div>
+              {creatorData.map((c,i) => {
+                const { tier, tierBg, tierColor } = tierConfig(c);
+                return (
+                  <div key={i} className="creator-row" style={{display:"grid",gridTemplateColumns:"190px 1fr 1fr 1fr 1fr 1fr 1fr 80px",padding:"13px 24px",borderBottom:`1px solid ${BORDER}`,background:i%2===0?WARM_WHITE:CREAM,alignItems:"center"}}>
+                    <div style={{fontFamily:"'Jost',sans-serif",fontSize:12,color:TEXT_DARK,fontWeight:c.orders>5?500:400}}>{c.name}</div>
+                    <div style={{fontFamily:"'Jost',sans-serif",fontSize:12,color:c.sales>0?GOLD:TEXT_LIGHT,fontWeight:c.sales>0?500:400}}>{c.sales>0?fmtFull$(c.sales):"—"}</div>
+                    <div style={{fontFamily:"'Jost',sans-serif",fontSize:12,color:TEXT_MID}}>{c.spend>0?fmtFull$(c.spend):"—"}</div>
+                    <div style={{fontFamily:"'Jost',sans-serif",fontSize:12,color:c.orders>0?TEXT_DARK:TEXT_LIGHT}}>{c.orders>0?c.orders:"—"}</div>
+                    <div style={{fontFamily:"'Jost',sans-serif",fontSize:12,color:TEXT_MID}}>{c.clicks>0?c.clicks.toLocaleString():"—"}</div>
+                    <div style={{fontFamily:"'Jost',sans-serif",fontSize:12,color:c.cvr>4?GOLD:TEXT_MID}}>{c.cvr!==null&&c.clicks>0?`${c.cvr}%`:"—"}</div>
+                    <div style={{fontFamily:"'Jost',sans-serif",fontSize:12,color:TEXT_MID}}>{c.cpc!==null&&c.cpc>0?`$${c.cpc}`:"—"}</div>
+                    <div><span style={{fontFamily:"'Jost',sans-serif",fontSize:11,fontWeight:500,background:tierBg,color:tierColor,border:`1px solid ${tierColor}55`,borderRadius:3,padding:"2px 9px"}}>{tier}</span></div>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{marginTop:16,display:"flex",gap:20,flexWrap:"wrap"}}>
+              {[
+                {tier:"A",label:">$5k sales",      bg:"#F5EFE4", color:GOLD},
+                {tier:"B",label:"$1k–$5k sales",   bg:"#F0EDE6", color:GOLD_LIGHT},
+                {tier:"C",label:"<$1k sales",       bg:CREAM,     color:TEXT_MID},
+                {tier:"D",label:"Clicks, no conv.", bg:"#F9EDED", color:"#B05A5A"},
+                {tier:"F",label:"No results",       bg:CREAM,     color:TEXT_LIGHT},
+              ].map(t => (
+                <div key={t.tier} style={{display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontFamily:"'Jost',sans-serif",fontSize:11,fontWeight:500,background:t.bg,color:t.color,border:`1px solid ${t.color}55`,borderRadius:3,padding:"2px 8px"}}>{t.tier}</span>
+                  <span style={{fontFamily:"'Jost',sans-serif",fontSize:11,color:TEXT_LIGHT}}>{t.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* TIMELINE */}
+        {activeTab === "timeline" && (
+          <div style={{display:"flex",flexDirection:"column",gap:24}}>
+            <div className="insight-card" style={{background:WARM_WHITE,border:`1px solid ${BORDER}`,borderRadius:8,padding:28,boxShadow:"0 2px 12px rgba(44,36,22,0.05)"}}>
+              <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:17,fontWeight:600,color:TEXT_DARK,marginBottom:3}}>Daily Sales</div>
+              <div style={{fontFamily:"'Jost',sans-serif",fontSize:10,color:TEXT_LIGHT,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:20}}>September through November 2025</div>
+              <ResponsiveContainer width="100%" height={240}>
+                <LineChart data={dailyData} margin={{right:20}}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={CREAM_DARK} vertical={false} />
+                  <XAxis dataKey="date" tick={{fontSize:9,fill:TEXT_LIGHT,fontFamily:"Jost,sans-serif"}} axisLine={false} tickLine={false} interval={3} />
+                  <YAxis tickFormatter={fmt$} tick={{fontSize:10,fill:TEXT_LIGHT,fontFamily:"Jost,sans-serif"}} axisLine={false} tickLine={false} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Line type="monotone" dataKey="sales" name="sales" stroke={GOLD} strokeWidth={2} dot={{fill:GOLD,r:3,strokeWidth:0}} activeDot={{r:5,fill:GOLD}} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="insight-card" style={{background:WARM_WHITE,border:`1px solid ${BORDER}`,borderRadius:8,padding:28,boxShadow:"0 2px 12px rgba(44,36,22,0.05)"}}>
+              <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:17,fontWeight:600,color:TEXT_DARK,marginBottom:3}}>Daily Orders</div>
+              <div style={{fontFamily:"'Jost',sans-serif",fontSize:10,color:TEXT_LIGHT,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:20}}>Units sold per active day</div>
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={dailyData} margin={{right:20}}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={CREAM_DARK} vertical={false} />
+                  <XAxis dataKey="date" tick={{fontSize:9,fill:TEXT_LIGHT,fontFamily:"Jost,sans-serif"}} axisLine={false} tickLine={false} interval={3} />
+                  <YAxis tick={{fontSize:10,fill:TEXT_LIGHT,fontFamily:"Jost,sans-serif"}} axisLine={false} tickLine={false} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="orders" name="Orders" fill={GOLD_LIGHT} radius={[3,3,0,0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}}>
+              {[
+                {label:"Peak Day",          value:"Oct 9",    sub:"$4,514 in sales · 8 orders",       accent:GOLD},
+                {label:"Campaign Duration", value:"~10 weeks",sub:"Sep 11 – Nov 22, 2025",             accent:GOLD_LIGHT},
+                {label:"Avg Daily Sales",   value:"$1,202",   sub:"on 40 of 72 campaign days",         accent:TEXT_LIGHT},
+              ].map((s,i) => (
+                <div key={i} className="insight-card" style={{background:WARM_WHITE,border:`1px solid ${BORDER}`,borderTop:`3px solid ${s.accent}`,borderRadius:8,padding:24,boxShadow:"0 2px 12px rgba(44,36,22,0.05)"}}>
+                  <div style={{fontFamily:"'Jost',sans-serif",fontSize:10,color:TEXT_LIGHT,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:10}}>{s.label}</div>
+                  <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:26,fontWeight:600,color:s.accent}}>{s.value}</div>
+                  <div style={{fontFamily:"'Jost',sans-serif",fontSize:11,color:TEXT_LIGHT,marginTop:6}}>{s.sub}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── FOOTER ── */}
+      <div style={{borderTop:`1px solid ${BORDER}`,background:WARM_WHITE,padding:"16px 48px",display:"flex",justifyContent:"space-between"}}>
+        <span style={{fontFamily:"'Jost',sans-serif",fontSize:10,color:TEXT_LIGHT,letterSpacing:"0.06em"}}>Mockingbird Single-to-Double Stroller 2.0 · ASIN B0F3WYZNNK</span>
+        <span style={{fontFamily:"'Jost',sans-serif",fontSize:10,color:TEXT_LIGHT,letterSpacing:"0.06em"}}>FCW × Mockingbird · Amazon Management</span>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<Dashboard />);
+</script>
+</body>
+</html>
