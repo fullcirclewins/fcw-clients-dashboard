@@ -2,10 +2,246 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0; url=mockingbird/" />
-  <title>Redirecting…</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FCW Clients Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #9B7A3E;
+      --gold-light: #C4A265;
+      --gold-pale: #D4B878;
+      --cream: #F2EDE6;
+      --cream-dark: #E8E0D4;
+      --warm-white: #FAF7F3;
+      --text-dark: #2C2416;
+      --text-mid: #6B5B3E;
+      --text-light: #9E8B6F;
+      --border: #DDD5C4;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--cream);
+      font-family: 'Jost', sans-serif;
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+
+    /* Subtle grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 256px;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+      position: relative;
+    }
+
+    /* Decorative corner accents */
+    .page::before,
+    .page::after {
+      content: '';
+      position: fixed;
+      width: 120px;
+      height: 120px;
+      border-color: var(--gold-light);
+      border-style: solid;
+      opacity: 0.2;
+      animation: cornerFade 1.8s ease-out both;
+    }
+    .page::before {
+      top: 40px;
+      left: 40px;
+      border-width: 1px 0 0 1px;
+    }
+    .page::after {
+      bottom: 40px;
+      right: 40px;
+      border-width: 0 1px 1px 0;
+    }
+
+    @keyframes cornerFade {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 0.2; transform: scale(1); }
+    }
+
+    /* Main card */
+    .card {
+      background: var(--warm-white);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      max-width: 560px;
+      width: 100%;
+      padding: 64px 56px;
+      text-align: center;
+      position: relative;
+      box-shadow:
+        0 1px 3px rgba(44, 36, 22, 0.04),
+        0 8px 40px rgba(44, 36, 22, 0.06);
+      animation: cardReveal 1s ease-out both;
+    }
+
+    @keyframes cardReveal {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Gold accent line at top of card */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      animation: lineExpand 1.2s ease-out 0.4s both;
+    }
+
+    @keyframes lineExpand {
+      from { width: 0; opacity: 0; }
+      to { width: 60px; opacity: 1; }
+    }
+
+    .monogram {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 13px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 36px;
+      animation: textFade 0.8s ease-out 0.3s both;
+    }
+
+    .title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 700;
+      font-size: 38px;
+      line-height: 1.15;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+      animation: textFade 0.8s ease-out 0.5s both;
+    }
+
+    .subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: 28px;
+      color: var(--gold);
+      line-height: 1.3;
+      margin-bottom: 40px;
+      animation: textFade 0.8s ease-out 0.6s both;
+    }
+
+    .divider {
+      width: 32px;
+      height: 1px;
+      background: var(--border);
+      margin: 0 auto 36px;
+      animation: textFade 0.8s ease-out 0.7s both;
+    }
+
+    .description {
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      font-size: 14px;
+      line-height: 1.85;
+      color: var(--text-mid);
+      max-width: 380px;
+      margin: 0 auto 40px;
+      animation: textFade 0.8s ease-out 0.8s both;
+    }
+
+    .badge {
+      display: inline-block;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 8px 24px;
+      font-family: 'Jost', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-light);
+      animation: textFade 0.8s ease-out 1s both;
+    }
+
+    @keyframes textFade {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Footer */
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: textFade 0.8s ease-out 1.2s both;
+    }
+
+    .footer span {
+      font-family: 'Jost', sans-serif;
+      font-size: 10px;
+      color: var(--text-light);
+      letter-spacing: 0.06em;
+      opacity: 0.6;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .card { padding: 48px 32px; }
+      .title { font-size: 30px; }
+      .subtitle { font-size: 22px; }
+      .page::before, .page::after { display: none; }
+      .footer { padding: 12px 24px; }
+    }
+  </style>
 </head>
 <body>
-  <p>Redirecting to <a href="mockingbird/">Mockingbird Dashboard</a>…</p>
+  <div class="page">
+    <div class="card">
+      <div class="monogram">Full Circle Wins</div>
+      <div class="title">Clients Dashboard</div>
+      <div class="subtitle">Performance Reports</div>
+      <div class="divider"></div>
+      <p class="description">
+        This is a private reporting portal for FCW clients.
+        Each client receives a dedicated link to access
+        their campaign performance report.
+      </p>
+      <div class="badge">Invite Only</div>
+    </div>
+  </div>
+  <div class="footer">
+    <span>FCW &middot; Amazon Management</span>
+    <span>Clients Dashboard</span>
+  </div>
 </body>
 </html>
