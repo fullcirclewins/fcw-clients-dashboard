@@ -4,421 +4,539 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mockingbird – Brand Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold:       #9B7A3E;
+    --gold-light: #C4A265;
+    --cream:      #F2EDE6;
+    --cream-dark: #E8E0D4;
+    --warm-white: #FAF7F3;
+    --text-dark:  #2C2416;
+    --text-mid:   #6B5B3E;
+    --text-light: #9E8B6F;
+    --border:     #DDD5C4;
+    --red:        #B05A5A;
+    --red-bg:     #F9EDED;
+    --green:      #5A7D62;
+    --green-bg:   #EBF4EC;
+    --purple:     #7B6FA5;
+  }
 
   body {
-    font-family: "Amazon Ember", "Helvetica Neue", Arial, sans-serif;
-    background: #EAEDED;
-    color: #0F1111;
+    font-family: 'Jost', sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
     font-size: 13px;
     min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .header-tag {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    color: var(--text-light);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1.1;
+  }
+  .header-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    font-weight: 400;
+    color: var(--gold);
+    line-height: 1.2;
+  }
+  .header-right {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+  }
+  .header-meta {
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    color: var(--text-light);
+    line-height: 1.8;
+  }
+  .week-toggle-wrap { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; }
+  .week-toggle-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-light);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .week-btns { display: flex; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+  .week-btn {
+    padding: 8px 20px;
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--warm-white);
+    color: var(--text-mid);
+    border: none;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .week-btn:not(:last-child) { border-right: 1px solid var(--border); }
+  .week-btn.active { background: var(--gold); color: var(--warm-white); }
+  .week-btn:hover:not(.active) { background: var(--cream-dark); color: var(--gold); }
+
+  /* ── KPI STRIP ── */
+  .kpi-strip {
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .kpi-item {
+    padding: 20px 28px;
+    border-right: 1px solid var(--border);
+  }
+  .kpi-item:last-child { border-right: none; }
+  .kpi-item.highlight { background: #F5EFE4; }
+  .kpi-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    color: var(--text-light);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .kpi-label .info {
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: var(--text-light);
+    cursor: help;
+  }
+  .kpi-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text-dark);
+    line-height: 1.1;
+  }
+  .kpi-item.highlight .kpi-val { color: var(--gold); }
+  .kpi-change {
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    color: var(--green);
+    margin-top: 5px;
+  }
+  .kpi-change::before { content: '▲ '; }
+
+  /* ── TABS ── */
+  .tabs-bar {
+    background: var(--cream-dark);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    padding: 12px 48px;
+    gap: 10px;
+  }
+  .tab-btn {
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 10px 28px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--warm-white);
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .tab-btn:hover { background: var(--cream-dark); border-color: var(--gold-light); color: var(--gold); }
+  .tab-btn.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--warm-white);
+    box-shadow: 0 2px 8px rgba(155,122,62,0.25);
+  }
+
+  /* ── MAIN ── */
+  .main-content { padding: 36px 48px; }
+
+  .chart-layout {
+    display: grid;
+    grid-template-columns: 1fr 250px;
+    gap: 22px;
+    margin-bottom: 28px;
+  }
+
+  .panel {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(44,36,22,0.05);
+  }
+  .panel-header { padding: 22px 28px 0; }
+  .panel-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 3px;
+  }
+  .panel-sub {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    color: var(--text-light);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .sankey-svg { width: 100%; height: 290px; display: block; }
+
+  /* ── RIGHT COLUMN ── */
+  .right-col { display: flex; flex-direction: column; gap: 18px; }
+
+  .def-box {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 18px;
+  }
+  .def-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+  .def-text {
+    font-family: 'Jost', sans-serif;
+    font-size: 11.5px;
+    color: var(--text-mid);
+    line-height: 1.65;
+  }
+
+  .rec-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 14px;
+  }
+  .rec-card {
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--gold);
+    border-radius: 6px;
     padding: 16px;
   }
-
-  .page {
-    background: white;
-    max-width: 1240px;
-    margin: 0 auto;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-    overflow: hidden;
-  }
-
-  /* ── Filter bar ── */
-  .filter-bar {
-    padding: 14px 24px;
-    border-bottom: 1px solid #DDD;
-    display: flex;
-    gap: 20px;
-    align-items: flex-end;
-    flex-wrap: wrap;
-  }
-  .filter-group { display: flex; flex-direction: column; gap: 4px; }
-  .filter-group label { font-size: 11px; font-weight: 700; color: #333; letter-spacing: 0.2px; }
-  .filter-select {
-    padding: 5px 30px 5px 9px;
-    border: 1px solid #adb1b8;
-    border-radius: 3px;
-    font-size: 13px;
-    color: #0F1111;
-    background: linear-gradient(to bottom, #f7f8fa, #e7e9ec);
-    min-width: 170px;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23555'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 9px center;
-    cursor: pointer;
-  }
-  .apply-btn {
-    padding: 5px 18px;
-    border: 1px solid #adb1b8;
-    border-radius: 3px;
-    background: linear-gradient(to bottom, #f7f8fa, #e7e9ec);
-    font-size: 13px;
-    color: #0F1111;
-    cursor: pointer;
-    font-weight: 400;
-    height: 29px;
-  }
-  .apply-btn:hover { background: linear-gradient(to bottom, #e9eaf0, #d5d7dc); }
-
-  /* ── Week toggle (custom) ── */
-  .week-toggle-wrap {
-    margin-left: auto;
-    display: flex;
-    align-items: flex-end;
-    gap: 6px;
-  }
-  .week-toggle-wrap label { font-size: 11px; font-weight: 700; color: #333; display: block; margin-bottom: 4px; }
-  .week-btns { display: flex; }
-  .week-btn {
-    padding: 5px 14px;
-    border: 1px solid #adb1b8;
-    background: linear-gradient(to bottom, #f7f8fa, #e7e9ec);
-    font-size: 12px;
-    color: #333;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .week-btn:first-child { border-radius: 3px 0 0 3px; }
-  .week-btn:last-child { border-radius: 0 3px 3px 0; border-left: none; }
-  .week-btn.active {
-    background: #232F3E;
-    color: #FF9900;
-    border-color: #131921;
+  .rec-card h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
     font-weight: 600;
-    z-index: 1;
+    color: var(--text-dark);
+    margin-bottom: 8px;
   }
-
-  /* ── Tabs ── */
-  .tabs {
-    display: flex;
-    border-bottom: 1px solid #DDD;
-    padding: 0 24px;
-    background: white;
+  .rec-card p {
+    font-family: 'Jost', sans-serif;
+    font-size: 11.5px;
+    color: var(--text-mid);
+    line-height: 1.65;
+    margin-bottom: 14px;
   }
-  .tab {
-    padding: 11px 18px;
-    font-size: 13px;
-    color: #555;
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    margin-bottom: -1px;
-    user-select: none;
-  }
-  .tab:hover:not(.active) { color: #0F1111; border-bottom-color: #ccc; }
-  .tab.active { color: #007185; border-bottom-color: #007185; font-weight: 600; }
-
-  /* ── Definition + Metrics strip ── */
-  .metrics-area {
-    display: flex;
-    align-items: stretch;
-    padding: 14px 24px;
-    border-bottom: 1px solid #DDD;
-    background: #fafafa;
-    gap: 0;
-  }
-  .definition-box {
-    padding-right: 20px;
-    border-right: 1px solid #DDD;
-    margin-right: 20px;
-    max-width: 200px;
-    min-width: 160px;
-  }
-  .definition-box .def-title { font-weight: 700; font-size: 12px; margin-bottom: 4px; }
-  .definition-box .def-text { font-size: 11px; color: #555; line-height: 1.5; }
-  .metrics-list { display: flex; gap: 0; flex: 1; flex-wrap: wrap; }
-  .metric-item {
-    flex: 1;
-    padding: 0 20px 0 0;
-    min-width: 120px;
-  }
-  .metric-label { font-size: 11.5px; color: #555; margin-bottom: 3px; display: flex; align-items: center; gap: 4px; }
-  .metric-label .info-icon { width: 13px; height: 13px; border-radius: 50%; border: 1px solid #999; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; color: #666; cursor: help; flex-shrink: 0; }
-  .metric-val { font-size: 20px; font-weight: 700; color: #0F1111; line-height: 1.2; }
-  .metric-change { font-size: 11px; color: #067D62; margin-top: 2px; }
-  .metric-change::before { content: '▲ '; }
-
-  /* ── Chart area ── */
-  .chart-section {
-    display: grid;
-    grid-template-columns: 1fr 230px;
-  }
-  .sankey-wrap {
-    padding: 20px 20px 30px 24px;
-    position: relative;
-    min-height: 380px;
-  }
-  .sankey-svg { width: 100%; height: 340px; display: block; }
-
-  /* ── Recommended Actions panel ── */
-  .rec-panel {
-    border-left: 1px solid #DDD;
-    padding: 20px 18px;
-  }
-  .rec-title { font-size: 15px; font-weight: 600; color: #0F1111; margin-bottom: 16px; }
-  .rec-card {
-    border: 1px solid #DDD;
-    border-radius: 4px;
-    padding: 14px;
-  }
-  .rec-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
-  .rec-card p { font-size: 12px; color: #555; line-height: 1.55; margin-bottom: 14px; }
   .rec-cta {
-    display: block;
-    width: 100%;
-    padding: 8px;
-    background: #007185;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    text-align: center;
+    display: block; width: 100%; padding: 9px;
+    background: var(--gold); color: var(--warm-white);
+    border: none; border-radius: 4px;
+    font-family: 'Jost', sans-serif;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    cursor: pointer; text-align: center;
+    transition: background 0.18s;
   }
-  .rec-cta:hover { background: #005f6e; }
+  .rec-cta:hover { background: var(--text-dark); }
 
-  /* ── WoW comparison strip ── */
-  .wow-strip {
-    border-top: 1px solid #DDD;
-    padding: 16px 24px;
-    background: #fafafa;
+  /* ── WoW STRIP ── */
+  .wow-header {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin-bottom: 16px;
   }
-  .wow-strip h3 { font-size: 13px; font-weight: 700; margin-bottom: 12px; color: #333; }
+  .wow-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-dark);
+  }
+  .week-legend { display: flex; gap: 16px; }
+  .wl { display: flex; align-items: center; gap: 6px; font-family: 'Jost', sans-serif; font-size: 11px; color: var(--text-light); }
+  .wl-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
   .wow-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 12px;
+    gap: 14px;
   }
   .wow-card {
-    background: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    padding: 10px 12px;
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 6px rgba(44,36,22,0.04);
+    transition: box-shadow 0.18s;
   }
-  .wow-card-label { font-size: 10.5px; color: #666; margin-bottom: 6px; }
-  .wow-card-vals { display: flex; gap: 10px; align-items: baseline; }
-  .wow-v1 { font-size: 16px; font-weight: 700; color: #C99A5E; }
-  .wow-v2 { font-size: 16px; font-weight: 700; color: #7B6FA5; }
+  .wow-card:hover { box-shadow: 0 4px 18px rgba(155,122,62,0.13); }
+  .wow-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    color: var(--text-light);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .wow-vals { display: flex; gap: 8px; align-items: baseline; }
+  .wow-v1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; font-weight: 600;
+    color: var(--gold);
+  }
+  .wow-v2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; font-weight: 600;
+    color: var(--purple);
+  }
   .wow-delta {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 1px 5px;
-    border-radius: 3px;
+    font-family: 'Jost', sans-serif;
+    font-size: 10px; font-weight: 500;
+    padding: 2px 7px; border-radius: 3px;
     margin-left: auto;
   }
-  .delta-up { background: #e6f4ea; color: #067D62; }
-  .delta-down { background: #fce8e8; color: #C7351C; }
-  .delta-neu { background: #f0f0f0; color: #666; }
-  .wow-week-labels { display: flex; gap: 8px; margin-bottom: 8px; font-size: 11px; }
-  .wl { display: flex; align-items: center; gap: 5px; color: #555; }
-  .wl-dot { width: 9px; height: 9px; border-radius: 2px; }
+  .delta-up   { background: var(--green-bg); color: var(--green); }
+  .delta-down { background: var(--red-bg);   color: var(--red);   }
+  .delta-neu  { background: var(--cream);    color: var(--text-light); }
 
-  /* ── Footer note ── */
+  /* ── FOOTER ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    background: var(--warm-white);
+    padding: 14px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 36px;
+  }
   .footer-note {
-    padding: 10px 24px;
-    font-size: 11px;
-    color: #777;
-    border-top: 1px solid #eee;
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
     font-style: italic;
+    color: var(--text-light);
+    max-width: 680px;
+  }
+  .footer-brand {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    color: var(--text-light);
+    letter-spacing: 0.06em;
   }
 </style>
 </head>
 <body>
 
-<div class="page">
-
-  <!-- Filter Bar -->
-  <div class="filter-bar">
-    <div class="filter-group">
-      <label>Brand</label>
-      <select class="filter-select"><option>Mockingbird</option></select>
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="header-tag">FCW × Mockingbird · Amazon Brand Analytics</div>
+    <div class="header-title">Brand Performance</div>
+    <div class="header-subtitle">Customer Journey Report</div>
+  </div>
+  <div class="header-right">
+    <div class="header-meta">
+      Mockingbird Single-to-Double Stroller 2.0<br>
+      Purchase Tab · Weekly View · 2026
     </div>
-    <div class="filter-group">
-      <label>Reporting Range</label>
-      <select class="filter-select"><option>Weekly</option></select>
-    </div>
-    <div class="filter-group">
-      <label>Select week</label>
-      <select class="filter-select" id="weekSelect">
-        <option value="w1">Week 9 | 2026-02-22 – 2026-02-28</option>
-        <option value="w2">Week 10 | 2026-03-01 – 2026-03-07</option>
-      </select>
-    </div>
-    <button class="apply-btn" onclick="applyWeek()">Apply</button>
-
     <div class="week-toggle-wrap">
-      <div>
-        <label>Compare Weeks</label>
-        <div class="week-btns">
-          <button class="week-btn active" id="btn-w1" onclick="switchWeek('w1')">2/28</button>
-          <button class="week-btn" id="btn-w2" onclick="switchWeek('w2')">3/7</button>
+      <div class="week-toggle-label">View Week</div>
+      <div class="week-btns">
+        <button class="week-btn active" id="btn-w1" onclick="switchWeek('w1')">Feb 28</button>
+        <button class="week-btn" id="btn-w2" onclick="switchWeek('w2')">Mar 7</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="kpi-strip" id="kpiStrip"></div>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <button class="tab-btn">Awareness</button>
+  <button class="tab-btn">Consideration</button>
+  <button class="tab-btn">Intent</button>
+  <button class="tab-btn active">Purchase</button>
+</div>
+
+<!-- MAIN -->
+<div class="main-content">
+
+  <div class="chart-layout">
+
+    <!-- SANKEY -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Customer Journey Flow</div>
+        <div class="panel-sub">Purchase path · customer count as metric · internal Amazon channel only</div>
+      </div>
+      <div style="padding: 0 20px 24px;">
+        <svg class="sankey-svg" id="sankeySvg" viewBox="0 0 860 290" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right-col">
+      <div class="panel" style="padding: 20px 20px;">
+        <div class="def-box">
+          <div class="def-label">Definition</div>
+          <div class="def-text">New to Brand Customers who did not purchase in the last 12 months.</div>
+        </div>
+      </div>
+      <div class="panel" style="padding: 20px 20px; flex:1">
+        <div class="rec-title">Recommended Actions</div>
+        <div class="rec-card">
+          <h4>Tailored Promotion</h4>
+          <p>Send a promotion to customers who purchased products complementary to selected products in the last 30 days.</p>
+          <button class="rec-cta">Create a Tailored Promotion</button>
         </div>
       </div>
     </div>
+
   </div>
 
-  <!-- Tabs -->
-  <div class="tabs">
-    <div class="tab">Awareness</div>
-    <div class="tab">Consideration</div>
-    <div class="tab">Intent</div>
-    <div class="tab active">Purchase</div>
-  </div>
-
-  <!-- Metrics -->
-  <div class="metrics-area" id="metricsArea">
-    <!-- populated by JS -->
-  </div>
-
-  <!-- Chart + Rec Panel -->
-  <div class="chart-section">
-    <div class="sankey-wrap">
-      <svg class="sankey-svg" id="sankeySvg" viewBox="0 0 920 340" preserveAspectRatio="xMidYMid meet"></svg>
-    </div>
-    <div class="rec-panel">
-      <div class="rec-title">Recommended Actions</div>
-      <div class="rec-card">
-        <h4>Tailored promotion</h4>
-        <p>Send a promotion to customers who purchased products complementary to selected products in the last 30 days.</p>
-        <button class="rec-cta">Create a Tailored Promotion</button>
+  <!-- WoW -->
+  <div>
+    <div class="wow-header">
+      <div class="wow-title">Week-over-Week Comparison</div>
+      <div class="week-legend">
+        <div class="wl"><div class="wl-dot" style="background:var(--gold)"></div>Week of 2/28</div>
+        <div class="wl"><div class="wl-dot" style="background:var(--purple)"></div>Week of 3/7</div>
       </div>
     </div>
-  </div>
-
-  <!-- WoW Comparison Strip -->
-  <div class="wow-strip">
-    <div class="wow-week-labels">
-      <div class="wl"><div class="wl-dot" style="background:#C99A5E"></div> Week 2/28</div>
-      <div class="wl"><div class="wl-dot" style="background:#7B6FA5"></div> Week 3/7</div>
-    </div>
-    <h3>Week-over-Week Key Metrics</h3>
     <div class="wow-grid">
-      <div class="wow-card">
-        <div class="wow-card-label">Category Search</div>
-        <div class="wow-card-vals"><span class="wow-v1">6,760</span><span class="wow-v2">2,874</span><span class="wow-delta delta-down">−57%</span></div>
-      </div>
-      <div class="wow-card">
-        <div class="wow-card-label">Brand Search</div>
-        <div class="wow-card-vals"><span class="wow-v1">5,947</span><span class="wow-v2">5,833</span><span class="wow-delta delta-down">−2%</span></div>
-      </div>
-      <div class="wow-card">
-        <div class="wow-card-label">Viewed Detail Page</div>
-        <div class="wow-card-vals"><span class="wow-v1">3,992</span><span class="wow-v2">5,994</span><span class="wow-delta delta-up">+50%</span></div>
-      </div>
-      <div class="wow-card">
-        <div class="wow-card-label">Add to Cart</div>
-        <div class="wow-card-vals"><span class="wow-v1">231</span><span class="wow-v2">651</span><span class="wow-delta delta-up">+182%</span></div>
-      </div>
-      <div class="wow-card">
-        <div class="wow-card-label">Total Purchase</div>
-        <div class="wow-card-vals"><span class="wow-v1">63</span><span class="wow-v2">282</span><span class="wow-delta delta-up">+348%</span></div>
-      </div>
-      <div class="wow-card">
-        <div class="wow-card-label">Search Drop Off</div>
-        <div class="wow-card-vals"><span class="wow-v1">6,251</span><span class="wow-v2">3,091</span><span class="wow-delta delta-up">−51%</span></div>
-      </div>
-      <div class="wow-card">
-        <div class="wow-card-label">Viewed Drop Off</div>
-        <div class="wow-card-vals"><span class="wow-v1">3,628</span><span class="wow-v2">5,103</span><span class="wow-delta delta-down">+41%</span></div>
-      </div>
-      <div class="wow-card">
-        <div class="wow-card-label">Cart Drop Off</div>
-        <div class="wow-card-vals"><span class="wow-v1">372</span><span class="wow-v2">781</span><span class="wow-delta delta-down">+110%</span></div>
-      </div>
-      <div class="wow-card">
-        <div class="wow-card-label">Repeat Customer</div>
-        <div class="wow-card-vals"><span class="wow-v1">1</span><span class="wow-v2">5</span><span class="wow-delta delta-up">+400%</span></div>
-      </div>
-      <div class="wow-card">
-        <div class="wow-card-label">One Time Purchase</div>
-        <div class="wow-card-vals"><span class="wow-v1">62</span><span class="wow-v2">277</span><span class="wow-delta delta-up">+347%</span></div>
-      </div>
+      <div class="wow-card"><div class="wow-label">Category Search</div><div class="wow-vals"><span class="wow-v1">6,760</span><span class="wow-v2">2,874</span><span class="wow-delta delta-down">−57%</span></div></div>
+      <div class="wow-card"><div class="wow-label">Brand Search</div><div class="wow-vals"><span class="wow-v1">5,947</span><span class="wow-v2">5,833</span><span class="wow-delta delta-down">−2%</span></div></div>
+      <div class="wow-card"><div class="wow-label">Viewed Detail Page</div><div class="wow-vals"><span class="wow-v1">3,992</span><span class="wow-v2">5,994</span><span class="wow-delta delta-up">+50%</span></div></div>
+      <div class="wow-card"><div class="wow-label">Add to Cart</div><div class="wow-vals"><span class="wow-v1">231</span><span class="wow-v2">651</span><span class="wow-delta delta-up">+182%</span></div></div>
+      <div class="wow-card"><div class="wow-label">Total Purchase</div><div class="wow-vals"><span class="wow-v1">63</span><span class="wow-v2">282</span><span class="wow-delta delta-up">+348%</span></div></div>
+      <div class="wow-card"><div class="wow-label">Search Drop Off</div><div class="wow-vals"><span class="wow-v1">6,251</span><span class="wow-v2">3,091</span><span class="wow-delta delta-up">−51%</span></div></div>
+      <div class="wow-card"><div class="wow-label">Viewed Drop Off</div><div class="wow-vals"><span class="wow-v1">3,628</span><span class="wow-v2">5,103</span><span class="wow-delta delta-down">+41%</span></div></div>
+      <div class="wow-card"><div class="wow-label">Cart Drop Off</div><div class="wow-vals"><span class="wow-v1">372</span><span class="wow-v2">781</span><span class="wow-delta delta-down">+110%</span></div></div>
+      <div class="wow-card"><div class="wow-label">Repeat Customer</div><div class="wow-vals"><span class="wow-v1">1</span><span class="wow-v2">5</span><span class="wow-delta delta-up">+400%</span></div></div>
+      <div class="wow-card"><div class="wow-label">One Time Purchase</div><div class="wow-vals"><span class="wow-v1">62</span><span class="wow-v2">277</span><span class="wow-delta delta-up">+347%</span></div></div>
     </div>
   </div>
 
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
   <div class="footer-note">*Internal Amazon Channel only. Journey shown across all ASINs with customer count as the metric. Awareness numbers may appear smaller than Consideration as they only reflect Amazon search traffic.</div>
+  <div class="footer-brand">FCW × Mockingbird · Amazon Management</div>
 </div>
 
 <script>
-// ─── DATA ───────────────────────────────────────────────────────────────────
 const WEEKS = {
   w1: {
-    label: 'Week 9 | 2026-02-22 – 2026-02-28',
-    metrics: {
-      newCustomers: { val: '63', change: '+320%' },
-      newSales:     { val: '$24,539.49', change: '+204.1%' },
-      newOrders:    { val: '64', change: '+326.67%' },
-      repeat:       { val: '1', change: null },
-      oneTime:      { val: '62', change: '+313.33%' },
-    },
-    // Nodes: { id, label, value, col, type }
+    kpis: [
+      { label:'New to Brand Customers', val:'63',        change:'+320%',    highlight:true  },
+      { label:'New to Brand Sales',     val:'$24,539',   change:'+204.1%',  highlight:false },
+      { label:'New to Brand Orders',    val:'64',        change:'+326.67%', highlight:false },
+      { label:'Repeat Customers',       val:'1',         change:null,        highlight:false },
+      { label:'One Time Purchase',      val:'62',        change:'+313.33%', highlight:true  },
+    ],
     nodes: [
-      { id:'catSearch',    label:'Category search',      val:6760,  col:0, type:'cat' },
-      { id:'brandSearch',  label:'Brand search',         val:5947,  col:0, type:'brand' },
-      { id:'viewDetail',   label:'Viewed Detail Page',   val:3992,  col:1, type:'cat' },
-      { id:'viewReview',   label:'Viewed Review Page',   val:77,    col:1, type:'cat' },
-      { id:'searchDrop',   label:'Drop off',             val:6251,  col:1, type:'drop' },
-      { id:'addCart',      label:'Added to Cart',        val:250,   col:2, type:'cat' },
-      { id:'addWish',      label:'Added to Wish List',   val:140,   col:2, type:'cat' },
-      { id:'saveLater',    label:'Saved for Later',      val:58,    col:2, type:'cat' },
-      { id:'viewDrop',     label:'Drop off',             val:3628,  col:2, type:'drop' },
-      { id:'purchase',     label:'Purchase',             val:63,    col:3, type:'cat' },
-      { id:'cartDrop',     label:'Drop off',             val:372,   col:3, type:'drop' },
-      { id:'repeat',       label:'Repeat Customers',     val:1,     col:4, type:'cat' },
-      { id:'oneTime',      label:'One time purchase',    val:62,    col:4, type:'cat' },
+      { id:'catSearch',   label:'Category search',    val:6760, col:0, type:'cat'   },
+      { id:'brandSearch', label:'Brand search',       val:5947, col:0, type:'brand' },
+      { id:'viewDetail',  label:'Viewed Detail Page', val:3992, col:1, type:'cat'   },
+      { id:'viewReview',  label:'Viewed Review Page', val:77,   col:1, type:'brand' },
+      { id:'searchDrop',  label:'Drop off',           val:6251, col:1, type:'drop'  },
+      { id:'addCart',     label:'Added to Cart',      val:250,  col:2, type:'cat'   },
+      { id:'addWish',     label:'Added to Wish List', val:140,  col:2, type:'brand' },
+      { id:'saveLater',   label:'Saved for Later',    val:58,   col:2, type:'brand' },
+      { id:'viewDrop',    label:'Drop off',           val:3628, col:2, type:'drop'  },
+      { id:'purchase',    label:'Purchase',           val:63,   col:3, type:'cat'   },
+      { id:'cartDrop',    label:'Drop off',           val:372,  col:3, type:'drop'  },
+      { id:'repeat',      label:'Repeat Customers',  val:1,    col:4, type:'brand' },
+      { id:'oneTime',     label:'One time purchase', val:62,   col:4, type:'cat'   },
     ],
     links: [
-      // cat search outgoing (total 6760)
       { from:'catSearch',   to:'viewDetail',  val:3200 },
       { from:'catSearch',   to:'viewReview',  val:58   },
       { from:'catSearch',   to:'searchDrop',  val:3502 },
-      // brand search outgoing (total 5947 → visual approx)
       { from:'brandSearch', to:'viewDetail',  val:792  },
       { from:'brandSearch', to:'searchDrop',  val:3200 },
-      // viewed detail outgoing (total ~3992)
       { from:'viewDetail',  to:'addCart',     val:231  },
       { from:'viewDetail',  to:'addWish',     val:140  },
       { from:'viewDetail',  to:'saveLater',   val:58   },
       { from:'viewDetail',  to:'viewDrop',    val:3563 },
-      // viewed review outgoing (total 77)
       { from:'viewReview',  to:'addCart',     val:10   },
       { from:'viewReview',  to:'viewDrop',    val:67   },
-      // cart nodes outgoing
       { from:'addCart',     to:'purchase',    val:33   },
       { from:'addCart',     to:'cartDrop',    val:218  },
       { from:'addWish',     to:'cartDrop',    val:140  },
       { from:'saveLater',   to:'cartDrop',    val:14   },
-      // purchase outgoing
       { from:'purchase',    to:'repeat',      val:1    },
       { from:'purchase',    to:'oneTime',     val:62   },
     ]
   },
   w2: {
-    label: 'Week 10 | 2026-03-01 – 2026-03-07',
-    metrics: {
-      newCustomers: { val: '282', change: '+348%' },
-      newSales:     { val: '$109,240.18', change: '+345%' },
-      newOrders:    { val: '282', change: '+340%' },
-      repeat:       { val: '5', change: '+400%' },
-      oneTime:      { val: '277', change: '+347%' },
-    },
+    kpis: [
+      { label:'New to Brand Customers', val:'282',       change:'+348%',  highlight:true  },
+      { label:'New to Brand Sales',     val:'$109,240',  change:'+345%',  highlight:false },
+      { label:'New to Brand Orders',    val:'282',       change:'+340%',  highlight:false },
+      { label:'Repeat Customers',       val:'5',         change:'+400%',  highlight:false },
+      { label:'One Time Purchase',      val:'277',       change:'+347%',  highlight:true  },
+    ],
     nodes: [
-      { id:'catSearch',    label:'Category search',      val:2874,  col:0, type:'cat' },
-      { id:'brandSearch',  label:'Brand search',         val:5833,  col:0, type:'brand' },
-      { id:'viewDetail',   label:'Viewed Detail Page',   val:5994,  col:1, type:'cat' },
-      { id:'viewReview',   label:'Viewed Review Page',   val:100,   col:1, type:'cat' },
-      { id:'searchDrop',   label:'Drop off',             val:3091,  col:1, type:'drop' },
-      { id:'addCart',      label:'Added to Cart',        val:651,   col:2, type:'cat' },
-      { id:'addWish',      label:'Added to Wish List',   val:250,   col:2, type:'cat' },
-      { id:'saveLater',    label:'Saved for Later',      val:185,   col:2, type:'cat' },
-      { id:'viewDrop',     label:'Drop off',             val:5103,  col:2, type:'drop' },
-      { id:'purchase',     label:'Purchase',             val:282,   col:3, type:'cat' },
-      { id:'cartDrop',     label:'Drop off',             val:781,   col:3, type:'drop' },
-      { id:'repeat',       label:'Repeat Customers',     val:5,     col:4, type:'cat' },
-      { id:'oneTime',      label:'One time purchase',    val:277,   col:4, type:'cat' },
+      { id:'catSearch',   label:'Category search',    val:2874, col:0, type:'cat'   },
+      { id:'brandSearch', label:'Brand search',       val:5833, col:0, type:'brand' },
+      { id:'viewDetail',  label:'Viewed Detail Page', val:5994, col:1, type:'cat'   },
+      { id:'viewReview',  label:'Viewed Review Page', val:100,  col:1, type:'brand' },
+      { id:'searchDrop',  label:'Drop off',           val:3091, col:1, type:'drop'  },
+      { id:'addCart',     label:'Added to Cart',      val:651,  col:2, type:'cat'   },
+      { id:'addWish',     label:'Added to Wish List', val:250,  col:2, type:'brand' },
+      { id:'saveLater',   label:'Saved for Later',    val:185,  col:2, type:'brand' },
+      { id:'viewDrop',    label:'Drop off',           val:5103, col:2, type:'drop'  },
+      { id:'purchase',    label:'Purchase',           val:282,  col:3, type:'cat'   },
+      { id:'cartDrop',    label:'Drop off',           val:781,  col:3, type:'drop'  },
+      { id:'repeat',      label:'Repeat Customers',  val:5,    col:4, type:'brand' },
+      { id:'oneTime',     label:'One time purchase', val:277,  col:4, type:'cat'   },
     ],
     links: [
       { from:'catSearch',   to:'viewDetail',  val:2000 },
@@ -444,184 +562,113 @@ const WEEKS = {
   }
 };
 
-// ─── COLORS ──────────────────────────────────────────────────────────────────
-const COLORS = {
-  cat:   '#7B6FA5',   // purple/lavender
-  brand: '#C99A5E',   // warm tan/bronze
-  drop:  '#E8A830',   // amber/orange drop off
+const NODE_COLORS = {
+  cat:   '#9B7A3E',
+  brand: '#C4A265',
+  drop:  '#D4C0A0',
 };
 const LINK_COLORS = {
-  cat:   'rgba(123,111,165,0.38)',
-  brand: 'rgba(201,154,94,0.38)',
-  drop:  'rgba(232,168,48,0.35)',
+  cat:   'rgba(155,122,62,0.26)',
+  brand: 'rgba(196,162,101,0.26)',
+  drop:  'rgba(180,150,100,0.18)',
 };
+const TXT_DARK  = '#2C2416';
+const TXT_LIGHT = '#9E8B6F';
 
-// ─── STATE ───────────────────────────────────────────────────────────────────
 let activeWeek = 'w1';
 
-// ─── METRICS RENDER ──────────────────────────────────────────────────────────
-function renderMetrics(wk) {
-  const m = WEEKS[wk].metrics;
-  document.getElementById('metricsArea').innerHTML = `
-    <div class="definition-box">
-      <div class="def-title">Definition</div>
-      <div class="def-text">New to Brand Customers who did not purchase in the last 12 months.</div>
-    </div>
-    <div class="metrics-list">
-      ${metricHTML('New to Brand Customers', m.newCustomers)}
-      ${metricHTML('New to Brand Sales', m.newSales)}
-      ${metricHTML('New to Brand Orders', m.newOrders)}
-      ${metricHTML('Repeat Customers', m.repeat)}
-      ${metricHTML('One Time Purchase', m.oneTime)}
-    </div>`;
-}
-function metricHTML(label, m) {
-  return `<div class="metric-item">
-    <div class="metric-label">${label} <span class="info-icon">ⓘ</span></div>
-    <div class="metric-val">${m.val}</div>
-    ${m.change ? `<div class="metric-change">${m.change}</div>` : ''}
-  </div>`;
+function renderKPIs(wk) {
+  document.getElementById('kpiStrip').innerHTML = WEEKS[wk].kpis.map(k => `
+    <div class="kpi-item${k.highlight?' highlight':''}">
+      <div class="kpi-label">${k.label} <span class="info">ⓘ</span></div>
+      <div class="kpi-val">${k.val}</div>
+      ${k.change ? `<div class="kpi-change">${k.change}</div>` : ''}
+    </div>`).join('');
 }
 
-// ─── SANKEY RENDERER ─────────────────────────────────────────────────────────
 function renderSankey(wk) {
   const svg = document.getElementById('sankeySvg');
   svg.innerHTML = '';
-  const W = 920, H = 340;
+  const { nodes, links } = WEEKS[wk];
+  const VH=290, GAP=8, PAD_T=22, AVAIL=VH-PAD_T-14;
+  const COL_X=[28,210,420,618,788], NODE_W=14;
+  const FF = "'Jost','Helvetica Neue',Arial,sans-serif";
 
-  const data = WEEKS[wk];
-  const { nodes, links } = data;
-
-  // Column x positions (left edge of node rect)
-  const COL_X   = [30, 230, 450, 640, 810];
-  const NODE_W  = 18;
-  const GAP     = 10;   // px between nodes in same col
-  const PAD_TOP = 18;
-  const AVAIL_H = H - PAD_TOP - 20;
-
-  // ── Layout nodes per column ──
-  const byCol = {};
-  nodes.forEach(n => { (byCol[n.col] = byCol[n.col]||[]).push(n); });
-
-  Object.entries(byCol).forEach(([col, colNodes]) => {
-    const totalVal = colNodes.reduce((s,n)=>s+n.val,0);
-    const totalGap = GAP * (colNodes.length - 1);
-    const valH = AVAIL_H - totalGap;
-    let y = PAD_TOP;
-    colNodes.forEach(n => {
-      n.h = Math.max(5, (n.val / totalVal) * valH);
-      n.x = COL_X[parseInt(col)];
-      n.y = y;
-      y += n.h + GAP;
-    });
+  const byCol={};
+  nodes.forEach(n=>{ (byCol[n.col]=byCol[n.col]||[]).push(n); });
+  Object.entries(byCol).forEach(([c,ns])=>{
+    const tot=ns.reduce((s,n)=>s+n.val,0), gaps=GAP*(ns.length-1);
+    let y=PAD_T;
+    ns.forEach(n=>{ n.h=Math.max(4,(n.val/tot)*(AVAIL-gaps)); n.x=COL_X[+c]; n.y=y; y+=n.h+GAP; });
   });
 
-  // ── Build node map & track offsets ──
-  const nMap = {};
-  nodes.forEach(n => { nMap[n.id] = n; n.rOff = 0; n.lOff = 0; });
+  const nMap={};
+  nodes.forEach(n=>{ nMap[n.id]=n; n.rOff=0; n.lOff=0; });
+  const ft={},tt={};
+  links.forEach(l=>{ ft[l.from]=(ft[l.from]||0)+l.val; tt[l.to]=(tt[l.to]||0)+l.val; });
 
-  // ── Compute link heights per side ──
-  const fromTotals = {}, toTotals = {};
-  links.forEach(l => {
-    fromTotals[l.from] = (fromTotals[l.from]||0) + l.val;
-    toTotals[l.to]     = (toTotals[l.to]||0) + l.val;
+  links.forEach(l=>{
+    const A=nMap[l.from],B=nMap[l.to]; if(!A||!B)return;
+    const lA=(l.val/ft[l.from])*A.h, lB=(l.val/tt[l.to])*B.h;
+    const x0=A.x+NODE_W,y0t=A.y+A.rOff,y0b=y0t+lA;
+    const x1=B.x,y1t=B.y+B.lOff,y1b=y1t+lB;
+    const mx=(x0+x1)/2;
+    mkEl(svg,'path',{d:`M${x0},${y0t}C${mx},${y0t} ${mx},${y1t} ${x1},${y1t}L${x1},${y1b}C${mx},${y1b} ${mx},${y0b} ${x0},${y0b}Z`,fill:LINK_COLORS[A.type],stroke:'none'});
+    A.rOff+=lA; B.lOff+=lB;
   });
 
-  // ── Draw links ──
-  links.forEach(link => {
-    const A = nMap[link.from], B = nMap[link.to];
-    if (!A || !B) return;
-
-    const lhA = (link.val / fromTotals[link.from]) * A.h;
-    const lhB = (link.val / toTotals[link.to]) * B.h;
-
-    const x0 = A.x + NODE_W, y0t = A.y + A.rOff, y0b = y0t + lhA;
-    const x1 = B.x,          y1t = B.y + B.lOff,  y1b = y1t + lhB;
-    const mx = (x0 + x1) / 2;
-
-    const d = `M${x0},${y0t} C${mx},${y0t} ${mx},${y1t} ${x1},${y1t} L${x1},${y1b} C${mx},${y1b} ${mx},${y0b} ${x0},${y0b}Z`;
-
-    const color = LINK_COLORS[A.type] || LINK_COLORS.cat;
-    appendSVG(svg, 'path', { d, fill: color, stroke: 'none' });
-
-    A.rOff += lhA;
-    B.lOff += lhB;
-  });
-
-  // ── Draw nodes ──
-  nodes.forEach(n => {
-    const fill = COLORS[n.type] || COLORS.cat;
-    appendSVG(svg, 'rect', {
-      x: n.x, y: n.y, width: NODE_W, height: n.h,
-      fill, rx: 1.5
-    });
-
-    // ── Labels ──
-    const isLastCol = n.col === 4;
-    const isFirstCol = n.col === 0;
-    const midY = n.y + n.h / 2;
-
-    if (isFirstCol) {
-      // Label left of node
-      const lx = n.x - 6;
-      appendText(svg, n.label,    lx, midY - 5,  { anchor:'end', fill:'#333', size:10.5, weight:400 });
-      appendText(svg, fmt(n.val), lx, midY + 8,  { anchor:'end', fill:'#555', size:10,   weight:400 });
-    } else if (isLastCol) {
-      const lx = n.x + NODE_W + 6;
-      appendText(svg, n.label,    lx, midY - 4,  { anchor:'start', fill:'#333', size:10.5, weight:400 });
-      appendText(svg, fmt(n.val), lx, midY + 8,  { anchor:'start', fill:'#555', size:10,   weight:400 });
+  nodes.forEach(n=>{
+    mkEl(svg,'rect',{x:n.x,y:n.y,width:NODE_W,height:n.h,fill:NODE_COLORS[n.type],rx:2});
+    const my=n.y+n.h/2;
+    if(n.col===0){
+      mkTxt(svg,n.label,  n.x-8,my-5,{a:'end',  fill:TXT_DARK, sz:10,  ff, w:400});
+      mkTxt(svg,fmt(n.val),n.x-8,my+7,{a:'end',  fill:TXT_LIGHT,sz:9.5, ff, w:400});
+    } else if(n.col===4){
+      mkTxt(svg,n.label,  n.x+NODE_W+7,my-5,{a:'start',fill:TXT_DARK, sz:10,  ff, w:400});
+      mkTxt(svg,fmt(n.val),n.x+NODE_W+7,my+7,{a:'start',fill:TXT_LIGHT,sz:9.5, ff, w:400});
     } else {
-      // Label above node if tall enough, otherwise side
-      const lx = n.x + NODE_W / 2;
-      if (n.h >= 18) {
-        appendText(svg, n.label,    lx, n.y - 9,  { anchor:'middle', fill:'#333', size:10, weight:400 });
-        appendText(svg, fmt(n.val), lx, n.y - 1,  { anchor:'middle', fill:'#555', size:9.5, weight:400 });
+      const cx=n.x+NODE_W/2;
+      if(n.h>=16){
+        mkTxt(svg,n.label,  cx,n.y-9,{a:'middle',fill:TXT_DARK, sz:9.5,ff,w:400});
+        mkTxt(svg,fmt(n.val),cx,n.y-1,{a:'middle',fill:TXT_LIGHT,sz:9,  ff,w:400});
       } else {
-        // Small node — label to the right
-        const rx = n.x + NODE_W + 5;
-        appendText(svg, n.label,    rx, midY - 3,  { anchor:'start', fill:'#333', size:10, weight:400 });
-        appendText(svg, fmt(n.val), rx, midY + 7,  { anchor:'start', fill:'#555', size:9.5, weight:400 });
+        mkTxt(svg,n.label,  n.x+NODE_W+5,my-4,{a:'start',fill:TXT_DARK, sz:9.5,ff,w:400});
+        mkTxt(svg,fmt(n.val),n.x+NODE_W+5,my+5,{a:'start',fill:TXT_LIGHT,sz:9,  ff,w:400});
       }
     }
   });
+
+  // Legend
+  [['#9B7A3E','Category Path'],['#C4A265','Brand Path'],['#D4C0A0','Drop Off']].forEach(([c,l],i)=>{
+    mkEl(svg,'rect',{x:18+(i*120),y:VH-13,width:8,height:8,fill:c,rx:1.5});
+    mkTxt(svg,l,30+(i*120),VH-5,{a:'start',fill:TXT_LIGHT,sz:8.5,ff,w:400});
+  });
 }
 
-function appendSVG(parent, tag, attrs) {
-  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
-  Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k, v));
-  parent.appendChild(el);
-  return el;
+function mkEl(p,tag,attrs){
+  const e=document.createElementNS('http://www.w3.org/2000/svg',tag);
+  Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));
+  p.appendChild(e); return e;
 }
-function appendText(parent, txt, x, y, opts={}) {
-  const el = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-  el.setAttribute('x', x);
-  el.setAttribute('y', y);
-  el.setAttribute('text-anchor', opts.anchor || 'middle');
-  el.setAttribute('fill', opts.fill || '#333');
-  el.setAttribute('font-size', opts.size || 11);
-  el.setAttribute('font-weight', opts.weight || 400);
-  el.setAttribute('font-family', '"Amazon Ember","Helvetica Neue",Arial,sans-serif');
-  el.textContent = txt;
-  parent.appendChild(el);
-  return el;
+function mkTxt(p,text,x,y,o={}){
+  const e=document.createElementNS('http://www.w3.org/2000/svg','text');
+  e.setAttribute('x',x); e.setAttribute('y',y);
+  e.setAttribute('text-anchor',o.a||'middle');
+  e.setAttribute('fill',o.fill||TXT_DARK);
+  e.setAttribute('font-size',o.sz||10);
+  e.setAttribute('font-weight',o.w||400);
+  e.setAttribute('font-family',o.ff||"'Jost',sans-serif");
+  e.textContent=text; p.appendChild(e); return e;
 }
-function fmt(n) { return n.toLocaleString(); }
+function fmt(n){ return n.toLocaleString(); }
 
-// ─── INTERACTIONS ─────────────────────────────────────────────────────────────
-function switchWeek(wk) {
-  activeWeek = wk;
-  document.getElementById('btn-w1').classList.toggle('active', wk==='w1');
-  document.getElementById('btn-w2').classList.toggle('active', wk==='w2');
-  document.getElementById('weekSelect').value = wk;
-  renderMetrics(wk);
-  renderSankey(wk);
-}
-function applyWeek() {
-  switchWeek(document.getElementById('weekSelect').value);
+function switchWeek(wk){
+  activeWeek=wk;
+  ['w1','w2'].forEach(w=>document.getElementById('btn-'+w).classList.toggle('active',w===wk));
+  renderKPIs(wk); renderSankey(wk);
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
-renderMetrics(activeWeek);
+renderKPIs(activeWeek);
 renderSankey(activeWeek);
 </script>
 </body>
