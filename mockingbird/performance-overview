@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockingbird – Brand Performance Analysis · Stroller 3.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#F2EDE6;font-family:'Jost',sans-serif;color:#2C2416}
+:root{--gold:#9B7A3E;--gl:#C4A265;--gp:#E8D9BF;--cream:#F2EDE6;--cd:#E8E0D4;--ww:#FAF7F3;--td:#2C2416;--tm:#6B5B3E;--tl:#9E8B6F;--br:#DDD5C4;--red:#A84848;--rb:#F5EBEB;--grn:#4A7A55;--gb:#EBF2ED;--teal:#1D7E9A;--e1:#C4A265;--e2:#9B7A3E;--e3:#4A7A55}
+.header{background:var(--ww);border-bottom:1px solid var(--br);padding:30px 48px;display:flex;justify-content:space-between;align-items:flex-start}
+.heyebrow{font-size:10px;color:var(--tl);letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px}
+.htitle{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:var(--td);line-height:1.1}
+.hsubtitle{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:400;color:var(--gold)}
+.hmeta{font-size:11px;color:var(--tl);line-height:2.1;text-align:right}
+.badge{display:inline-block;margin-top:8px;font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:4px 12px;border-radius:3px;border:1px solid}
+.badge-g{color:var(--grn);background:var(--gb);border-color:#b4d4bc}
+.events{background:var(--cd);border-bottom:1px solid var(--br);display:grid;grid-template-columns:1fr 1fr 1fr}
+.ev{padding:14px 22px;border-right:1px solid var(--br);display:flex;gap:12px;align-items:flex-start}
+.ev:last-child{border-right:none}
+.evicon{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px}
+.evtag{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;margin-bottom:3px}
+.evtitle{font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:600;color:var(--td);margin-bottom:2px}
+.evdesc{font-size:10px;color:var(--tm);line-height:1.55}
+.evdate{font-size:9.5px;color:var(--tl);margin-top:3px;font-style:italic}
+.kpis{background:var(--ww);border-bottom:1px solid var(--br);display:grid;grid-template-columns:repeat(7,1fr)}
+.kpi{padding:16px 18px;border-right:1px solid var(--br)}
+.kpi:last-child{border-right:none}
+.kpi.hi{background:#F5EFE4}
+.kpieye{font-size:9px;color:var(--tl);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.kpival{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--td);line-height:1.1}
+.kpi.hi .kpival{color:var(--gold)}
+.kpisub{font-size:9.5px;color:var(--tm);margin-top:2px}
+.delta{display:inline-flex;align-items:center;font-size:9.5px;font-weight:600;padding:2px 6px;border-radius:3px;margin-top:4px}
+.up{background:var(--gb);color:var(--grn)}.down{background:var(--rb);color:var(--red)}.neu{background:var(--cream);color:var(--tl)}
+.tabs{background:var(--cd);border-bottom:1px solid var(--br);display:flex;padding:10px 48px;gap:8px}
+.tbtn{font-family:'Jost',sans-serif;font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:9px 20px;border-radius:4px;border:1px solid var(--br);background:var(--ww);color:var(--tm);cursor:pointer;transition:all .18s}
+.tbtn:hover{background:var(--cd);border-color:var(--gl);color:var(--gold)}
+.tbtn.active{background:var(--gold);border-color:var(--gold);color:var(--ww);box-shadow:0 2px 8px rgba(155,122,62,.25)}
+.content{padding:28px 48px}
+.tp{display:none}.tp.active{display:block}
+.panel{background:var(--ww);border:1px solid var(--br);border-radius:8px;box-shadow:0 2px 12px rgba(44,36,22,.05);padding:22px 24px}
+.ptitle{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--td);margin-bottom:3px}
+.psub{font-size:9.5px;color:var(--tl);letter-spacing:.07em;text-transform:uppercase;margin-bottom:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+.mb18{margin-bottom:18px}.mb28{margin-bottom:28px}
+.icards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.icard{background:var(--ww);border:1px solid var(--br);border-radius:8px;padding:18px 19px;box-shadow:0 2px 12px rgba(44,36,22,.05);transition:box-shadow .18s}
+.icard:hover{box-shadow:0 6px 22px rgba(155,122,62,.12)}
+.iflag{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;margin-bottom:7px}
+.ititle{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--td);margin-bottom:8px}
+.ibody{font-size:11px;color:var(--tm);line-height:1.75}
+.eras{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
+.ecard{background:var(--ww);border:1px solid var(--br);border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(44,36,22,.05)}
+.echead{padding:14px 18px 12px;border-bottom:1px solid var(--br)}
+.ectag{font-size:9px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px}
+.ecname{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--td)}
+.ecdates{font-size:9.5px;color:var(--tl);margin-top:3px;font-style:italic;line-height:1.55}
+.ecbody{padding:12px 18px;display:flex;flex-direction:column;gap:8px}
+.ecm{display:flex;justify-content:space-between;align-items:center}
+.ecml{font-size:10.5px;color:var(--tm)}
+.ecmv{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600}
+.ecdiv{height:1px;background:var(--br);margin:2px 0}
+.pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+.pill{font-size:9px;font-weight:500;padding:2px 7px;border-radius:10px;letter-spacing:.04em;border:1px solid}
+.dt{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed}
+.dt th{font-size:9px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--tl);padding:9px 8px;text-align:right;border-bottom:2px solid var(--br);background:var(--cream);white-space:nowrap;width:8%}
+.dt th:first-child{text-align:left;width:20%}
+.dt td{padding:7px 8px;text-align:right;border-bottom:1px solid var(--br);color:var(--tm);font-size:11px;overflow:hidden;text-overflow:ellipsis}
+.dt td:first-child{text-align:left;color:var(--td);font-weight:500;white-space:nowrap}
+.dt tr:hover td{background:#F5EFE4}
+.dt .sr td{background:var(--cream);color:var(--tl);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;font-weight:600}
+.dt .e2c{background:rgba(155,122,62,.07)}.dt .e3c{background:rgba(74,122,85,.09)}
+.hv{color:var(--gold);font-weight:600}.bv{color:var(--grn);font-weight:700}.wv{color:var(--red)}
+.adkpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.adkpi{background:var(--cream);border:1px solid var(--br);border-radius:6px;padding:13px 15px}
+.adkpil{font-size:9px;color:var(--tl);text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px}
+.adkpiv{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--td)}
+.adkpis2{font-size:9.5px;color:var(--tm);margin-top:2px}
+.mixrow{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.mixl{font-size:10.5px;color:var(--tm);width:150px;flex-shrink:0}
+.mixbw{flex:1;height:13px;background:var(--cd);border-radius:3px;overflow:hidden}
+.mixb{height:100%;border-radius:3px}
+.mixv{font-size:11px;font-weight:600;width:48px;text-align:right;flex-shrink:0}
+.mixp{font-size:9.5px;color:var(--tl);width:34px;text-align:right;flex-shrink:0}
+.legrow{display:flex;gap:16px;margin-bottom:9px;flex-wrap:wrap}
+.legi{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--tm)}
+.legdot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.cnote{background:#FBF5E8;border:1px solid #DCC98A;border-left:3px solid var(--gold);border-radius:4px;padding:10px 15px;margin-bottom:16px;font-size:11px;color:var(--tm);line-height:1.7}
+.cnote strong{color:var(--td)}
+.wnote{background:#F9EDEB;border:1px solid #D4A89A;border-left:3px solid var(--red);border-radius:4px;padding:10px 15px;margin-bottom:16px;font-size:11px;color:var(--tm);line-height:1.7}
+.wnote strong{color:var(--td)}
+.cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ccard{background:var(--cream);border:1px solid var(--br);border-radius:6px;padding:12px 14px}
+.ccl{font-size:9.5px;color:var(--tl);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.ccrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.ccwl{font-size:9.5px;color:var(--tm)}
+.ccv{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600}
+/* brand vs generic specific */
+.bgkpis{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:18px}
+.bgkpi{border-radius:8px;padding:18px 20px;display:flex;flex-direction:column;gap:6px}
+.bgkpi-brand{background:linear-gradient(135deg,#F5EFE4,#EDE5D4);border:1px solid var(--gp)}
+.bgkpi-generic{background:linear-gradient(135deg,#E8F1F8,#D8EAF4);border:1px solid #B8D4E8}
+.bgkpi-total{background:linear-gradient(135deg,#EBF3ED,#DBE9DF);border:1px solid #B4D4BC}
+.bgkpitag{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px}
+.bgkpimetric{display:flex;justify-content:space-between;align-items:center}
+.bgkpilabel{font-size:10.5px;color:var(--tm)}
+.bgkpival{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600}
+.bgkpidiv{height:1px;background:rgba(0,0,0,0.08);margin:4px 0}
+.bgmonthtable{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px}
+.bgmonth{background:var(--cream);border:1px solid var(--br);border-radius:7px;padding:14px 16px}
+.bgmonth-label{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--tl);margin-bottom:10px}
+.bgrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.bgrl{font-size:10px;color:var(--tm)}
+.bgrb{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600}
+.bgrdiv{height:1px;background:var(--br);margin:6px 0}
+/* bundle callout */
+.bundle-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:14px}
+.bundle-item{background:var(--cream);border:1px solid var(--br);border-radius:6px;padding:12px 14px;text-align:center}
+.bundle-num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;line-height:1}
+.bundle-label{font-size:9.5px;color:var(--tm);margin-top:4px;line-height:1.4}
+/* sessions */
+.session-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.footer{border-top:1px solid var(--br);background:var(--ww);padding:12px 48px;display:flex;justify-content:space-between;align-items:center}
+.footer span{font-size:10px;color:var(--tl);letter-spacing:.06em}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="heyebrow">FCW × Mockingbird · Amazon Brand Analytics</div>
+    <div class="htitle">Performance Analysis</div>
+    <div class="hsubtitle">10-Week Customer Journey · Stroller 3.0</div>
+  </div>
+  <div>
+    <div class="hmeta">Mockingbird Single-to-Double Stroller 3.0<br>+ 2nd Seat Kit · Bassinet · Car Seat Adapters<br>Amazon Seller Central · Jan 3 – Mar 7, 2026</div>
+    <div style="text-align:right"><span class="badge badge-g">Accessories Launched 2/24 · FCW Began 3/1</span></div>
+  </div>
+</div>
+
+<div class="events">
+  <div class="ev">
+    <div class="evicon" style="background:#F5EFE4">📦</div>
+    <div>
+      <div class="evtag" style="color:var(--e1)">Phase 1 · Jan 3 – Feb 21 · 7 Weeks</div>
+      <div class="evtitle">Stroller 2.0</div>
+      <div class="evdesc">Single SKU stroller only. Flat performance. No accessories. ACoS averaging 55.7% across baseline period.</div>
+      <div class="evdate">Avg 38 purchases/wk · $23,986 gross sales · $575 AOV</div>
+    </div>
+  </div>
+  <div class="ev">
+    <div class="evicon" style="background:#F0EAE0">🚀</div>
+    <div>
+      <div class="evtag" style="color:var(--e2)">Feb 24 Launch · Sun–Sat week ends 2/28</div>
+      <div class="evtitle">Stroller 3.0 + Full Accessory Launch</div>
+      <div class="evdesc">New stroller + 2nd Seat Kit, Bassinet, Car Seat Adapters go live Feb 24 (Mon). First 4 days in this week. Prior agency still active.</div>
+      <div class="evdate">Week ending 2/28 · 84 units · $28,389 gross sales</div>
+    </div>
+  </div>
+  <div class="ev">
+    <div class="evicon" style="background:#EBF2ED">⚡</div>
+    <div>
+      <div class="evtag" style="color:var(--e3)">Mar 1 FCW Takes Over · New week starts 3/1</div>
+      <div class="evtitle">FCW Ad Management · Full Ecosystem</div>
+      <div class="evdesc">FCW steps in Sun Mar 1. First full FCW week with Stroller 3.0 + complete accessory catalog. Retargeting launched on AMS 3/10.</div>
+      <div class="evdate">Week ending 3/7 · 404 units · $86,774 gross sales</div>
+    </div>
+  </div>
+</div>
+
+<div class="kpis">
+  <div class="kpi hi"><div class="kpieye">Gross Sales · Week of 3/7</div><div class="kpival">$86,774</div><div class="kpisub">vs. $23,986 baseline avg</div><div class="delta up">▲ +262%</div></div>
+  <div class="kpi"><div class="kpieye">Sessions · Week of 3/7</div><div class="kpival">14,754</div><div class="kpisub">Stroller sessions: 11,337</div><div class="delta up">▲ +145%</div></div>
+  <div class="kpi"><div class="kpieye">Platform CVR · Week of 3/7</div><div class="kpival">2.67%</div><div class="kpisub">vs. 0.64% baseline avg</div><div class="delta up">▲ +317%</div></div>
+  <div class="kpi hi"><div class="kpieye">Brand ROAS · March (MTD)</div><div class="kpival">20.6×</div><div class="kpisub">vs. 3.5× in Feb · 3.1× in Jan</div><div class="delta up">▲ +487% MoM</div></div>
+  <div class="kpi hi"><div class="kpieye">Generic ROAS · March (MTD)</div><div class="kpival">2.44×</div><div class="kpisub">vs. 0.35× in Feb · 0.75× in Jan</div><div class="delta up">▲ +600% MoM</div></div>
+  <div class="kpi"><div class="kpieye">ACoS · Week of 3/7</div><div class="kpival">10.8%</div><div class="kpisub">vs. 55.7% baseline avg</div><div class="delta up">▲ −81%</div></div>
+  <div class="kpi"><div class="kpieye">CAC Per Stroller · 3/7</div><div class="kpival">$25.86</div><div class="kpisub">vs. $57.63 baseline avg</div><div class="delta up">▲ −55%</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tbtn active" onclick="switchTab('story',this)">Performance Story</button>
+  <button class="tbtn" onclick="switchTab('brandgen',this)">Brand vs Generic</button>
+  <button class="tbtn" onclick="switchTab('ads',this)">Ad Performance</button>
+  <button class="tbtn" onclick="switchTab('funnel',this)">Funnel + Sessions</button>
+  <button class="tbtn" onclick="switchTab('eras',this)">Era Comparison</button>
+  <button class="tbtn" onclick="switchTab('data',this)">Full Data Table</button>
+</div>
+
+<!-- ══ STORY TAB ══ -->
+<div id="tab-story" class="tp active">
+<div class="content">
+  <div class="g2 mb18">
+    <div class="panel">
+      <div class="ptitle">Gross Sales — 10-Week Trend</div>
+      <div class="psub">Total revenue · Stroller + Accessories stacked · event markers</div>
+      <div class="legrow">
+        <div class="legi"><div class="legdot" style="background:var(--e1)"></div>Phase 1: Stroller 2.0</div>
+        <div class="legi"><div class="legdot" style="background:var(--e2)"></div>Launch Week</div>
+        <div class="legi"><div class="legdot" style="background:var(--e3)"></div>FCW Week 1</div>
+      </div>
+      <div style="position:relative;height:200px"><canvas id="cSales"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="ptitle">Sessions + Platform Conversion Rate</div>
+      <div class="psub">Weekly store sessions (bar) · platform CVR % (line)</div>
+      <div style="position:relative;height:230px"><canvas id="cSessions"></canvas></div>
+    </div>
+  </div>
+  <div class="g2 mb18">
+    <div class="panel">
+      <div class="ptitle">Purchase Volume Trend</div>
+      <div class="psub">Total purchases (Amazon funnel) — all 10 weeks</div>
+      <div style="position:relative;height:190px"><canvas id="cPurch"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="ptitle">Units Sold — Stroller vs Accessories</div>
+      <div class="psub">Volume breakdown · accessories debut week of 2/28</div>
+      <div style="position:relative;height:190px"><canvas id="cUnits"></canvas></div>
+    </div>
+  </div>
+  <div class="icards">
+    <div class="icard" style="border-top:3px solid var(--e3)">
+      <div class="iflag" style="color:var(--e3)">⚡ FCW Impact · Week 1</div>
+      <div class="ititle">$86,774 · 14,754 Sessions in First Managed Week</div>
+      <div class="ibody">FCW's first full week produced $86,774 in gross sales — 3.6× the baseline average. Sessions surged to 14,754 (+145%) with stroller-specific sessions at 11,337, and Platform CVR hit 2.67% vs. a 0.64% baseline average. The combination of Stroller 3.0 and the full accessory catalog drove the strongest week in the dataset.</div>
+    </div>
+    <div class="icard" style="border-top:3px solid var(--teal)">
+      <div class="iflag" style="color:var(--teal)">🎯 Brand vs Category Search</div>
+      <div class="ititle">Brand Search Held Steady at 5,833</div>
+      <div class="ibody">Brand Search held at 5,833 in the FCW week, consistent with the 4,162–5,947 range across all 10 weeks. Category Search dropped to 2,874 in the FCW week — shifts in product launch and ad strategy may have contributed to this change. As the brand and Stroller 3.0 establish organic rank, we expect to see a natural shift in category search behavior over time.</div>
+    </div>
+    <div class="icard" style="border-top:3px solid var(--gold)">
+      <div class="iflag" style="color:var(--gold)">📦 Accessories: Bundle Behavior</div>
+      <div class="ititle">92.5% of Orders Were Single-Item · 7.5% Multi-Item</div>
+      <div class="ibody">Of 748 orders from 2/24–3/11, 56 (7.5%) included 2+ items: 46 paired a stroller with at least one accessory, and 10 were orders with 2 or more accessories without a stroller. The goal is stroller + accessory adoption — monitoring these bundle patterns will help guide virtual bundle strategy. Recommend tracking D2C accessory revenue alongside Amazon to understand the full picture as accessories scale.</div>
+    </div>
+    <div class="icard" style="border-top:3px solid var(--e2)">
+      <div class="iflag" style="color:var(--e2)">📉 The 2/21 Pre-Launch Trough</div>
+      <div class="ititle">15 Purchases · $8,625 — The Natural Low Point</div>
+      <div class="ibody">The week ending Feb 21 was the lowest point — only 15 purchases and $8,625 in sales. This reflects a natural transition as Stroller 2.0 listings wound down ahead of the Feb 24 launch. The prior agency's CAC hit $143 this week. The subsequent recovery to 63 purchases (2/28) and then 282 (3/7) makes the trajectory all the more striking.</div>
+    </div>
+    <div class="icard" style="border-top:3px solid var(--gl)">
+      <div class="iflag" style="color:var(--gl)">💰 AOV Shift: What It Means</div>
+      <div class="ititle">Lower AOV · Volume More Than Compensates</div>
+      <div class="ibody">AOV fell from $575 (stroller-only baseline) to $342 at launch and $220 in the FCW week as accessories entered the unit mix. Volume more than compensates — gross revenue tripled. The goal will be to find ways to increase bundling, such as leveraging virtual bundles to help increase AOV and sell a complete collection. Shifts in content along with the brand store launch should help support scale in this goal. Stroller revenue alone was $58,194 in the FCW week — still +2.4× the baseline.</div>
+    </div>
+    <div class="icard" style="border-top:3px solid var(--e3)">
+      <div class="iflag" style="color:var(--e3)">📈 Saved for Later → Retargeting Pipeline</div>
+      <div class="ititle">182 Saved · Retargeting Launched on AMS 3/10</div>
+      <div class="ibody">Saved for Later jumped from 58 (2/28) to 182 (3/7) — +214%. These are high-intent shoppers who've engaged deeply but haven't converted. FCW launched retargeting campaigns on AMS on 3/10 with low spend specifically to capture this latent demand pool.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ BRAND VS GENERIC TAB ══ -->
+<div id="tab-brandgen" class="tp">
+<div class="content">
+  <div class="cnote"><strong>Key Takeaway:</strong> Generic/category search remains the primary channel for capturing market share and new-to-brand customers. The critical story in March is efficiency: Generic ROAS improved from 0.35× in February to 2.44× in March — a 600% gain. By tightening efficiency across both brand and generic spend, FCW is doing more with the same budget, enabling greater investment in category awareness to take competitive market share rather than spending to capture customers already searching for Mockingbird.</div>
+
+  <div class="bgkpis">
+    <div class="bgkpi bgkpi-brand">
+      <div class="bgkpitag" style="color:var(--e2)">Brand Keywords + ASINs · YTD</div>
+      <div class="bgkpimetric"><span class="bgkpilabel">Total Spend</span><span class="bgkpival" style="color:var(--e2)">$11,563</span></div>
+      <div class="bgkpimetric"><span class="bgkpilabel">Total Sales</span><span class="bgkpival" style="color:var(--e2)">$71,986</span></div>
+      <div class="bgkpidiv"></div>
+      <div class="bgkpimetric"><span class="bgkpilabel">YTD ROAS</span><span class="bgkpival" style="color:var(--e2)">6.23×</span></div>
+      <div class="bgkpimetric"><span class="bgkpilabel">% of Total Spend</span><span class="bgkpival" style="color:var(--e2)">49.4%</span></div>
+    </div>
+    <div class="bgkpi bgkpi-generic">
+      <div class="bgkpitag" style="color:var(--teal)">Generic Keywords + ASINs · YTD</div>
+      <div class="bgkpimetric"><span class="bgkpilabel">Total Spend</span><span class="bgkpival" style="color:var(--teal)">$11,861</span></div>
+      <div class="bgkpimetric"><span class="bgkpilabel">Total Sales</span><span class="bgkpival" style="color:var(--teal)">$12,248</span></div>
+      <div class="bgkpidiv"></div>
+      <div class="bgkpimetric"><span class="bgkpilabel">YTD ROAS</span><span class="bgkpival" style="color:var(--teal)">1.03×</span></div>
+      <div class="bgkpimetric"><span class="bgkpilabel">% of Total Spend</span><span class="bgkpival" style="color:var(--teal)">50.6%</span></div>
+    </div>
+    <div class="bgkpi bgkpi-total">
+      <div class="bgkpitag" style="color:var(--e3)">Combined Total · YTD</div>
+      <div class="bgkpimetric"><span class="bgkpilabel">Total Spend</span><span class="bgkpival" style="color:var(--e3)">$23,424</span></div>
+      <div class="bgkpimetric"><span class="bgkpilabel">Total Sales</span><span class="bgkpival" style="color:var(--e3)">$84,234</span></div>
+      <div class="bgkpidiv"></div>
+      <div class="bgkpimetric"><span class="bgkpilabel">Blended ROAS</span><span class="bgkpival" style="color:var(--e3)">3.60×</span></div>
+      <div class="bgkpimetric"><span class="bgkpilabel">Brand Sales %</span><span class="bgkpival" style="color:var(--e3)">85.5%</span></div>
+    </div>
+  </div>
+
+  <div class="g2 mb18">
+    <div class="panel">
+      <div class="ptitle">ROAS by Type — Jan · Feb · Mar</div>
+      <div class="psub">Brand keywords vs Generic keywords monthly · dramatic improvement under FCW</div>
+      <div style="position:relative;height:220px"><canvas id="cBgRoas"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="ptitle">Ad Sales by Type — Monthly</div>
+      <div class="psub">Revenue attributed to brand vs generic keyword spend</div>
+      <div style="position:relative;height:220px"><canvas id="cBgSales"></canvas></div>
+    </div>
+  </div>
+
+  <div class="bgmonthtable">
+    <div class="bgmonth">
+      <div class="bgmonth-label" style="color:var(--e1)">January 2026 — Baseline</div>
+      <div class="bgrow"><span class="bgrl">Brand Spend (KW+ASIN)</span><span class="bgrb" style="color:var(--e2)">$4,751</span></div>
+      <div class="bgrow"><span class="bgrl">Brand Sales</span><span class="bgrb" style="color:var(--e2)">$14,950</span></div>
+      <div class="bgrow"><span class="bgrl">Brand ROAS</span><span class="bgrb" style="color:var(--e2)">3.15×</span></div>
+      <div class="bgrdiv"></div>
+      <div class="bgrow"><span class="bgrl">Generic Spend (KW+ASIN)</span><span class="bgrb" style="color:var(--teal)">$3,842</span></div>
+      <div class="bgrow"><span class="bgrl">Generic Sales</span><span class="bgrb" style="color:var(--teal)">$2,875</span></div>
+      <div class="bgrow"><span class="bgrl">Generic ROAS</span><span class="bgrb" style="color:var(--red)">0.75×</span></div>
+      <div class="bgrdiv"></div>
+      <div class="bgrow"><span class="bgrl">Blended ROAS</span><span class="bgrb" style="color:var(--tm)">2.07×</span></div>
+    </div>
+    <div class="bgmonth">
+      <div class="bgmonth-label" style="color:var(--e2)">February 2026 — Transition</div>
+      <div class="bgrow"><span class="bgrl">Brand Spend (KW+ASIN)</span><span class="bgrb" style="color:var(--e2)">$5,000</span></div>
+      <div class="bgrow"><span class="bgrl">Brand Sales</span><span class="bgrb" style="color:var(--e2)">$19,788</span></div>
+      <div class="bgrow"><span class="bgrl">Brand ROAS</span><span class="bgrb" style="color:var(--e2)">3.96×</span></div>
+      <div class="bgrdiv"></div>
+      <div class="bgrow"><span class="bgrl">Generic Spend (KW+ASIN)</span><span class="bgrb" style="color:var(--teal)">$4,876</span></div>
+      <div class="bgrow"><span class="bgrl">Generic Sales</span><span class="bgrb" style="color:var(--teal)">$1,699</span></div>
+      <div class="bgrow"><span class="bgrl">Generic ROAS</span><span class="bgrb" style="color:var(--red)">0.35×</span></div>
+      <div class="bgrdiv"></div>
+      <div class="bgrow"><span class="bgrl">Blended ROAS</span><span class="bgrb" style="color:var(--tm)">2.18×</span></div>
+    </div>
+    <div class="bgmonth" style="background:var(--gb);border-color:#b4d4bc">
+      <div class="bgmonth-label" style="color:var(--e3)">March 2026 — FCW Takes Over</div>
+      <div class="bgrow"><span class="bgrl">Brand Spend (KW+ASIN)</span><span class="bgrb" style="color:var(--e3)">$1,812</span></div>
+      <div class="bgrow"><span class="bgrl">Brand Sales</span><span class="bgrb" style="color:var(--e3)">$37,248</span></div>
+      <div class="bgrow"><span class="bgrl" style="font-weight:600">Brand ROAS (MTD)</span><span class="bgrb" style="color:var(--e3);font-size:20px">20.6×</span></div>
+      <div class="bgrdiv"></div>
+      <div class="bgrow"><span class="bgrl">Generic Spend (KW+ASIN)</span><span class="bgrb" style="color:var(--teal)">$3,143</span></div>
+      <div class="bgrow"><span class="bgrl">Generic Sales</span><span class="bgrb" style="color:var(--teal)">$7,674</span></div>
+      <div class="bgrow"><span class="bgrl" style="font-weight:600">Generic ROAS (MTD)</span><span class="bgrb" style="color:var(--teal);font-size:20px">2.44×</span></div>
+      <div class="bgrdiv"></div>
+      <div class="bgrow"><span class="bgrl" style="font-weight:600">Blended ROAS</span><span class="bgrb" style="color:var(--e3);font-size:20px">9.07×</span></div>
+    </div>
+  </div>
+
+  <div class="g2 mb18">
+    <div class="panel">
+      <div class="ptitle">Top Brand Search Terms — March 2026</div>
+      <div class="psub">By attributed ad sales · Brand KW only</div>
+      <table class="dt">
+        <thead><tr><th style="text-align:left">Search Term</th><th>Ad Sales</th><th>ROAS</th><th>ACoS</th><th>CVR</th></tr></thead>
+        <tbody>
+          <tr><td>mockingbird stroller</td><td class="hv">$12,072</td><td>13.1×</td><td>7.6%</td><td>2.5%</td></tr>
+          <tr><td>mockingbird single-to-double stroller 2.0</td><td>$11,127</td><td class="bv">30.8×</td><td>3.3%</td><td>5.2%</td></tr>
+          <tr><td>mockingbird double stroller</td><td>$2,242</td><td>18.5×</td><td>5.4%</td><td>3.7%</td></tr>
+          <tr><td>mocking bird stroller</td><td>$1,483</td><td class="bv">104.4×</td><td>1.0%</td><td>23.8%</td></tr>
+          <tr><td>mockingbird single to double stroller</td><td>$1,433</td><td class="bv">111.2×</td><td>0.9%</td><td>19.1%</td></tr>
+          <tr><td>mockingbird stroller accessories</td><td>$899</td><td>26.7×</td><td>3.7%</td><td>10.0%</td></tr>
+          <tr><td>mockingbird single-to-double stroller 3.0</td><td>$1,098</td><td>39.9×</td><td>1.8%</td><td>5.3%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <div class="ptitle">Top Generic Search Terms — March 2026</div>
+      <div class="psub">By attributed ad sales · Generic/Category KW · includes competitor ASINs</div>
+      <table class="dt">
+        <thead><tr><th style="text-align:left">Search Term</th><th>Ad Sales</th><th>ROAS</th><th>ACoS</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>single to double stroller</td><td class="hv">$1,098</td><td>23.9×</td><td>4.2%</td><td style="font-size:10px;color:var(--tm)">High intent</td></tr>
+          <tr><td>double stroller newborn + toddler</td><td>$824</td><td>7.7×</td><td>13.0%</td><td style="font-size:10px;color:var(--tm)">High volume</td></tr>
+          <tr><td>double stroller tandem</td><td>$759</td><td class="bv">324×</td><td>0.3%</td><td style="font-size:10px;color:var(--tm)">Very efficient</td></tr>
+          <tr><td>uppababy double stroller</td><td>$724</td><td class="bv">461×</td><td>0.2%</td><td style="font-size:10px;color:var(--red)">Competitor</td></tr>
+          <tr><td>nuna stroller</td><td>$599</td><td>44.5×</td><td>2.2%</td><td style="font-size:10px;color:var(--red)">Competitor</td></tr>
+          <tr><td>baby stroller</td><td>$549</td><td>15.3×</td><td>6.5%</td><td style="font-size:10px;color:var(--tm)">High volume</td></tr>
+          <tr><td>stroller</td><td>$549</td><td>7.5×</td><td>13.3%</td><td style="font-size:10px;color:var(--tm)">High volume</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="ptitle">Why Brand Keywords Outperform Generic — The Data</div>
+    <div class="psub">Month-over-month change: March vs February</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-top:4px">
+      <div class="adkpi">
+        <div class="adkpil">Brand ROAS Change</div>
+        <div class="adkpiv" style="color:var(--e3)">+420%</div>
+        <div class="adkpis2">3.96× Feb → 20.6× Mar</div>
+      </div>
+      <div class="adkpi">
+        <div class="adkpil">Generic ROAS Change</div>
+        <div class="adkpiv" style="color:var(--e3)">+600%</div>
+        <div class="adkpis2">0.35× Feb → 2.44× Mar</div>
+      </div>
+      <div class="adkpi">
+        <div class="adkpil">Brand Spend Reduction</div>
+        <div class="adkpiv" style="color:var(--gold)">−64%</div>
+        <div class="adkpis2">$5,000 Feb → $1,812 Mar</div>
+      </div>
+      <div class="adkpi">
+        <div class="adkpil">Brand Sales Increase</div>
+        <div class="adkpiv" style="color:var(--e3)">+88%</div>
+        <div class="adkpis2">$19,788 Feb → $37,248 Mar</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;font-size:11px;color:var(--tm);line-height:1.7;border-top:1px solid var(--br);padding-top:12px">
+      <strong style="color:var(--td)">FCW's approach:</strong> Generic and category search terms are the primary channel for capturing competitive market share and reaching new-to-brand customers. By tightening efficiency across both brand and generic spend — improving match types, negative keywords, and bid strategy — FCW is generating more output from the same budget. This creates the capacity to invest more aggressively in category awareness and competitive conquesting, taking market share rather than concentrating spend on customers already searching specifically for Mockingbird. The pace of optimization reflects this commitment: Amazon history shows 164 ad changes across all of January and February combined — in the first 10 days of March alone, FCW made 119 changes. That density of iteration directly drove the efficiency gains and accelerated generic adoption visible in the data.
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ ADS TAB ══ -->
+<div id="tab-ads" class="tp">
+<div class="content">
+  <div class="adkpis">
+    <div class="adkpi"><div class="adkpil">Avg ACoS · Baseline (7 wks)</div><div class="adkpiv" style="color:var(--red)">55.7%</div><div class="adkpis2">Jan 3 – Feb 21 weighted avg</div></div>
+    <div class="adkpi"><div class="adkpil">ACoS · FCW Week 1</div><div class="adkpiv" style="color:var(--e3)">10.8%</div><div class="adkpis2">Week of Mar 7 — down 81%</div></div>
+    <div class="adkpi"><div class="adkpil">Blended ROAS · Baseline avg</div><div class="adkpiv" style="color:var(--e1)">9.7×</div><div class="adkpis2">Platform blended stroller ROAS</div></div>
+    <div class="adkpi"><div class="adkpil">Blended ROAS · FCW Week 1</div><div class="adkpiv" style="color:var(--e3)">21.0×</div><div class="adkpis2">Week of Mar 7 — highest in dataset</div></div>
+  </div>
+  <div class="g2 mb18">
+    <div class="panel"><div class="ptitle">ACoS Trend — All 10 Weeks</div><div class="psub">Advertising cost of sale · lower = more efficient</div><div style="position:relative;height:200px"><canvas id="cAcos"></canvas></div></div>
+    <div class="panel"><div class="ptitle">Blended ROAS — Strollers</div><div class="psub">Gross sales ÷ total ad spend · all product types</div><div style="position:relative;height:200px"><canvas id="cRoas"></canvas></div></div>
+  </div>
+  <div class="g2 mb18">
+    <div class="panel"><div class="ptitle">Ad Spend vs Attributed Sales</div><div class="psub">Weekly spend vs attributed revenue — efficiency gap widening</div><div style="position:relative;height:190px"><canvas id="cSpend"></canvas></div></div>
+    <div class="panel"><div class="ptitle">CAC Per Stroller Sold</div><div class="psub">Customer acquisition cost — trending down under FCW</div><div style="position:relative;height:190px"><canvas id="cCac"></canvas></div></div>
+  </div>
+  <div class="panel">
+    <div class="ptitle">Ad Data — Full Weekly Summary</div>
+    <div class="psub">Sponsored Products · Sponsored Brands · Combined</div>
+    <table class="dt">
+      <thead><tr><th>Metric</th><th>1/3</th><th>1/10</th><th>1/17</th><th>1/24</th><th>1/31</th><th>2/7</th><th>2/14</th><th>2/21</th><th class="e2c">2/28</th><th class="e3c">3/7</th></tr></thead>
+      <tbody>
+        <tr class="sr"><td colspan="11">Sponsored Products</td></tr>
+        <tr><td>SP Spend</td><td>$1,257</td><td>$1,585</td><td>$1,701</td><td>$1,987</td><td>$2,093</td><td>$1,716</td><td>$2,742</td><td>$1,974</td><td class="e2c">$1,920</td><td class="e3c">$2,684</td></tr>
+        <tr><td>SP Sales</td><td>$4,025</td><td>$3,450</td><td>$6,325</td><td>$2,300</td><td>$5,175</td><td>$4,025</td><td>$2,875</td><td>$2,875</td><td class="e2c">$8,288</td><td class="e3c bv">$24,701</td></tr>
+        <tr class="sr"><td colspan="11">Sponsored Brands</td></tr>
+        <tr><td>SB Spend</td><td>$465</td><td>$542</td><td>$550</td><td>$466</td><td>$405</td><td>$457</td><td>$663</td><td>$153</td><td class="e2c">$213</td><td class="e3c">$82</td></tr>
+        <tr><td>SB Sales</td><td>$1,150</td><td>$1,150</td><td>$1,150</td><td>$575</td><td>$575</td><td>$1,150</td><td>$1,150</td><td>$0</td><td class="e2c">$575</td><td class="e3c">$899</td></tr>
+        <tr class="sr"><td colspan="11">Weekly Summary</td></tr>
+        <tr><td>Total Ad Spend</td><td>$1,722</td><td>$2,128</td><td>$2,251</td><td>$2,454</td><td>$2,498</td><td>$2,173</td><td>$3,410</td><td>$2,146</td><td class="e2c">$2,147</td><td class="e3c">$2,767</td></tr>
+        <tr><td>Total Ad Sales</td><td>$5,175</td><td>$4,600</td><td>$7,475</td><td>$2,875</td><td>$5,750</td><td>$5,175</td><td>$4,025</td><td>$2,875</td><td class="e2c">$8,863</td><td class="e3c bv">$25,600</td></tr>
+        <tr><td>ACoS</td><td>33.3%</td><td>46.3%</td><td>30.1%</td><td class="wv">85.3%</td><td>43.4%</td><td>42.0%</td><td class="wv">84.7%</td><td class="wv">74.7%</td><td class="e2c hv">24.2%</td><td class="e3c bv">10.8%</td></tr>
+        <tr><td>Attributed ROAS</td><td>3.01×</td><td>2.16×</td><td>3.32×</td><td>1.17×</td><td>2.30×</td><td>2.38×</td><td>1.18×</td><td>1.34×</td><td class="e2c hv">4.13×</td><td class="e3c bv">9.25×</td></tr>
+        <tr><td>Blended ROAS (Strollers)</td><td>9.69×</td><td>12.97×</td><td>12.51×</td><td>8.91×</td><td>9.44×</td><td>12.44×</td><td>6.75×</td><td class="wv">4.02×</td><td class="e2c hv">11.61×</td><td class="e3c bv">21.03×</td></tr>
+        <tr><td>CAC Per Stroller</td><td>$59.36</td><td>$44.33</td><td>$45.95</td><td>$64.57</td><td>$60.93</td><td>$46.23</td><td class="wv">$85.24</td><td class="wv">$143.09</td><td class="e2c hv">$47.72</td><td class="e3c bv">$25.86</td></tr>
+        <tr><td>Gross Sales</td><td>$16,675</td><td>$27,600</td><td>$28,175</td><td>$21,850</td><td>$23,575</td><td>$27,025</td><td>$23,000</td><td class="wv">$8,625</td><td class="e2c hv">$28,389</td><td class="e3c bv">$86,774</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ══ FUNNEL + SESSIONS TAB ══ -->
+<div id="tab-funnel" class="tp">
+<div class="content">
+  <div class="cnote"><strong>📊 Category Search:</strong> Category Search dropped from 6,760 (2/28) to 2,874 (3/7). Shifts in product launch timing and ad strategy may have contributed to this change — as Stroller 3.0 and the full accessory lineup establish organic rank, we expect to see a natural recovery and shift in category search behavior over time.</div>
+  <div class="cnote" style="margin-bottom:10px"><strong>⚠️ Viewed Drop Off Note:</strong> Total Viewed Drop Off shows anomalous spikes in Feb 7 (17,472) and Feb 14 (24,482) — 4–7× normal range. Cannot be explained by category search or confirmed in other accounts. Flagged and excluded from CVR calculations.</div>
+
+  <div class="panel mb18">
+    <div class="ptitle">Sessions + Platform Conversion Rate — All 10 Weeks</div>
+    <div class="psub">Weekly sessions (bar) · Platform CVR % (gold line) · Strollers-only CVR % (teal line)</div>
+    <div style="position:relative;height:240px"><canvas id="cSessionsFull"></canvas></div>
+  </div>
+
+  <div class="g2 mb18">
+    <div class="panel">
+      <div class="ptitle">Funnel Conversion Rates</div>
+      <div class="psub">Category Search→PDP · PDP→Cart · Cart→Purchase</div>
+      <div style="position:relative;height:200px"><canvas id="cConv"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="ptitle">Detail Page Views — Brand vs Category</div>
+      <div class="psub">Brand PDP (teal) · Category PDP (gold dashed) · clearly differentiated</div>
+      <div style="position:relative;height:200px"><canvas id="cPdp"></canvas></div>
+    </div>
+  </div>
+
+  <div class="panel-sub" style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--td);margin-bottom:4px">Conversion Snapshot</div>
+  <div style="font-size:9.5px;color:var(--tl);letter-spacing:.07em;text-transform:uppercase;margin-bottom:12px">Baseline avg (Jan 3–Feb 21) vs Launch Week (2/28) vs FCW Week 1 (3/7)</div>
+  <div class="cgrid mb18">
+    <div class="ccard"><div class="ccl">Sessions → Purchase (Platform CVR)</div>
+      <div class="ccrow"><span class="ccwl">Baseline avg</span><span class="ccv" style="color:var(--e1)">0.64%</span></div>
+      <div class="ccrow"><span class="ccwl">Launch 2/28</span><span class="ccv" style="color:var(--e2)">1.24%</span></div>
+      <div class="ccrow"><span class="ccwl">FCW 3/7</span><span class="ccv" style="color:var(--e3)">2.67%</span></div>
+    </div>
+    <div class="ccard"><div class="ccl">Sessions → Purchase (Strollers CVR)</div>
+      <div class="ccrow"><span class="ccwl">Baseline avg</span><span class="ccv" style="color:var(--e1)">0.64%</span></div>
+      <div class="ccrow"><span class="ccwl">Launch 2/28</span><span class="ccv" style="color:var(--e2)">0.73%</span></div>
+      <div class="ccrow"><span class="ccwl">FCW 3/7</span><span class="ccv" style="color:var(--e3)">0.94%</span></div>
+    </div>
+    <div class="ccard"><div class="ccl">PDP View → Add to Cart</div>
+      <div class="ccrow"><span class="ccwl">Baseline avg</span><span class="ccv" style="color:var(--e1)">5.4%</span></div>
+      <div class="ccrow"><span class="ccwl">Launch 2/28</span><span class="ccv" style="color:var(--e2)">4.3%</span></div>
+      <div class="ccrow"><span class="ccwl">FCW 3/7</span><span class="ccv" style="color:var(--e3)">10.6%</span></div>
+    </div>
+    <div class="ccard"><div class="ccl">Add to Cart → Purchase</div>
+      <div class="ccrow"><span class="ccwl">Baseline avg</span><span class="ccv" style="color:var(--e1)">14.8%</span></div>
+      <div class="ccrow"><span class="ccwl">Launch 2/28</span><span class="ccv" style="color:var(--e2)">27.3%</span></div>
+      <div class="ccrow"><span class="ccwl">FCW 3/7</span><span class="ccv" style="color:var(--e3)">44.2%</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ ERAS TAB ══ -->
+<div id="tab-eras" class="tp">
+<div class="content">
+  <div class="eras">
+    <div class="ecard">
+      <div class="echead" style="border-top:4px solid var(--e1)">
+        <div class="ectag" style="color:var(--e1)">Phase 1 · Jan 3 – Feb 21 · 7 Weeks</div>
+        <div class="ecname">Stroller 2.0</div>
+        <div class="ecdates">Single stroller SKU only — no accessories available on Amazon. ACoS averaged 55.7% across the baseline period. Sun–Sat weekly reporting throughout.</div>
+        <div class="pills"><span class="pill" style="background:#F5EFE4;color:var(--e2);border-color:var(--gp)">Stroller 2.0 (4 colors)</span><span class="pill" style="background:var(--rb);color:var(--red);border-color:#ddbcbc">No Accessories</span></div>
+      </div>
+      <div class="ecbody">
+        <div class="ecm"><span class="ecml">Avg Weekly Purchases</span><span class="ecmv" style="color:var(--e1)">37.7</span></div>
+        <div class="ecm"><span class="ecml">Avg Weekly Gross Sales</span><span class="ecmv" style="color:var(--e1)">$23,986</span></div>
+        <div class="ecm"><span class="ecml">Avg Weekly Sessions</span><span class="ecmv" style="color:var(--e1)">6,033</span></div>
+        <div class="ecm"><span class="ecml">Avg Platform CVR</span><span class="ecmv" style="color:var(--e1)">0.64%</span></div>
+        <div class="ecdiv"></div>
+        <div class="ecm"><span class="ecml">Cart → Purchase CVR</span><span class="ecmv" style="color:var(--e1)">14.8%</span></div>
+        <div class="ecm"><span class="ecml">Avg Blended ROAS</span><span class="ecmv" style="color:var(--e1)">9.7×</span></div>
+        <div class="ecm"><span class="ecml">Avg ACoS</span><span class="ecmv" style="color:var(--red)">55.7%</span></div>
+        <div class="ecm"><span class="ecml">Avg CAC Per Stroller</span><span class="ecmv" style="color:var(--e1)">$57.63</span></div>
+      </div>
+    </div>
+    <div class="ecard">
+      <div class="echead" style="border-top:4px solid var(--e2)">
+        <div class="ectag" style="color:var(--e2)">Phase 2 · Week ending Feb 28</div>
+        <div class="ecname">Stroller 3.0 Launch + Accessories</div>
+        <div class="ecdates">New stroller + accessories launched Mon Feb 24. Sun–Sat week (2/22–2/28) captures first 4 days of new catalog. Prior agency still active this final week.</div>
+        <div class="pills"><span class="pill" style="background:#F5EFE4;color:var(--e2);border-color:var(--gp)">Stroller 3.0</span><span class="pill" style="background:#F5EFE4;color:var(--e2);border-color:var(--gp)">2nd Seat Kit</span><span class="pill" style="background:#F5EFE4;color:var(--e2);border-color:var(--gp)">Bassinet</span><span class="pill" style="background:#F5EFE4;color:var(--e2);border-color:var(--gp)">Car Seat Adapters</span></div>
+      </div>
+      <div class="ecbody">
+        <div class="ecm"><span class="ecml">Total Purchases</span><span class="ecmv" style="color:var(--e2)">63 <small style="font-size:10px;color:var(--tl)">(84 units)</small></span></div>
+        <div class="ecm"><span class="ecml">Gross Sales</span><span class="ecmv" style="color:var(--e2)">$28,389</span></div>
+        <div class="ecm"><span class="ecml">Sessions</span><span class="ecmv" style="color:var(--e2)">6,629</span></div>
+        <div class="ecm"><span class="ecml">Platform CVR</span><span class="ecmv" style="color:var(--e2)">1.24%</span></div>
+        <div class="ecdiv"></div>
+        <div class="ecm"><span class="ecml">Cart → Purchase CVR</span><span class="ecmv" style="color:var(--e2)">27.3%</span></div>
+        <div class="ecm"><span class="ecml">Blended ROAS</span><span class="ecmv" style="color:var(--e2)">11.6×</span></div>
+        <div class="ecm"><span class="ecml">ACoS</span><span class="ecmv" style="color:var(--e2)">24.2%</span></div>
+        <div class="ecm"><span class="ecml">CAC Per Stroller</span><span class="ecmv" style="color:var(--e2)">$47.72</span></div>
+      </div>
+    </div>
+    <div class="ecard">
+      <div class="echead" style="border-top:4px solid var(--e3)">
+        <div class="ectag" style="color:var(--e3)">Phase 3 · Week ending Mar 7 · starts Mar 1</div>
+        <div class="ecname">FCW Management · Full Ecosystem</div>
+        <div class="ecdates">FCW took over Sun Mar 1. First full FCW-managed Sun–Sat week with Stroller 3.0 + complete accessory lineup all 7 days. Retargeting launched AMS 3/10.</div>
+        <div class="pills"><span class="pill" style="background:var(--gb);color:var(--e3);border-color:#b4d4bc">Stroller 3.0 · 107 units</span><span class="pill" style="background:var(--gb);color:var(--e3);border-color:#b4d4bc">Seat Kit · 72</span><span class="pill" style="background:var(--gb);color:var(--e3);border-color:#b4d4bc">Bassinet · 43</span><span class="pill" style="background:var(--gb);color:var(--e3);border-color:#b4d4bc">Adapters · 182</span></div>
+      </div>
+      <div class="ecbody">
+        <div class="ecm"><span class="ecml">Total Purchases</span><span class="ecmv" style="color:var(--e3)">282 <small style="font-size:10px;color:var(--tl)">(404 units)</small></span></div>
+        <div class="ecm"><span class="ecml">Gross Sales</span><span class="ecmv" style="color:var(--e3)">$86,774</span></div>
+        <div class="ecm"><span class="ecml">Sessions</span><span class="ecmv" style="color:var(--e3)">14,754</span></div>
+        <div class="ecm"><span class="ecml">Platform CVR</span><span class="ecmv" style="color:var(--e3)">2.67%</span></div>
+        <div class="ecdiv"></div>
+        <div class="ecm"><span class="ecml">Cart → Purchase CVR</span><span class="ecmv" style="color:var(--e3)">44.2%</span></div>
+        <div class="ecm"><span class="ecml">Blended ROAS</span><span class="ecmv" style="color:var(--e3)">21.0×</span></div>
+        <div class="ecm"><span class="ecml">ACoS</span><span class="ecmv" style="color:var(--e3)">10.8%</span></div>
+        <div class="ecm"><span class="ecml">CAC Per Stroller</span><span class="ecmv" style="color:var(--e3)">$25.86</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel mb18">
+    <div class="ptitle">Bundle Purchase Analysis — 2/24 to 3/11 (748 Total Orders)</div>
+    <div class="psub">Multi-item orders · 56 of 748 orders (7.5%) included 2+ items · goal is stroller + accessory adoption</div>
+    <div class="bundle-grid">
+      <div class="bundle-item">
+        <div class="bundle-num" style="color:var(--e3)">56</div>
+        <div class="bundle-label">Total Multi-Item<br>Orders (7.5%)</div>
+      </div>
+      <div class="bundle-item">
+        <div class="bundle-num" style="color:var(--e2)">13</div>
+        <div class="bundle-label">Stroller +<br>Car Seat Adapter</div>
+      </div>
+      <div class="bundle-item">
+        <div class="bundle-num" style="color:var(--e2)">12</div>
+        <div class="bundle-label">Stroller +<br>2nd Seat Kit</div>
+      </div>
+      <div class="bundle-item">
+        <div class="bundle-num" style="color:var(--e2)">15</div>
+        <div class="bundle-label">Stroller +<br>2+ Accessories</div>
+      </div>
+      <div class="bundle-item" style="border-color:var(--teal)">
+        <div class="bundle-num" style="color:var(--teal)">10</div>
+        <div class="bundle-label">2+ Accessories,<br>No Stroller<br><span style="font-size:8.5px;color:var(--tl)">(watch for growth)</span></div>
+      </div>
+    </div>
+    <div style="margin-top:14px;font-size:11px;color:var(--tm);line-height:1.7;border-top:1px solid var(--br);padding-top:12px">
+      <strong style="color:var(--td)">Bundle Strategy:</strong> 46 stroller+accessory orders represent early adoption of the complete collection — the pattern we want to grow. The 10 orders of 2+ accessories without a stroller are worth monitoring as accessories scale. Virtual bundles on Amazon can help increase AOV and drive stroller+accessory co-purchase behavior. Recommend tracking D2C accessory revenue alongside Amazon to understand the full cross-channel revenue picture.
+      <br><br><strong style="color:var(--td)">Note on Repeat Customer Tracking:</strong> Amazon recently removed FBM orders from repeat purchase and LTV reporting — a platform-level change that directly impacts our ability to tie prior customers back when they return to purchase additional products. We're planning to leverage Amazon Marketing Cloud (AMC) to help build this story, and are currently working through the relevant queries.
+    </div>
+  </div>
+
+  <div class="panel mb18"><div class="ptitle">Gross Sales by Era</div><div class="psub">Weekly revenue colored by phase — stroller + accessories stacked</div><div style="position:relative;height:200px"><canvas id="cEraSales"></canvas></div></div>
+
+  <div class="panel"><div class="ptitle">Accessory Mix — Week of 3/7</div><div class="psub">404 total units sold · product breakdown</div>
+    <div style="padding:6px 0">
+      <div class="mixrow"><span class="mixl">Car Seat Adapters</span><div class="mixbw"><div class="mixb" style="width:45%;background:var(--teal)"></div></div><span class="mixv" style="color:var(--teal)">182</span><span class="mixp">45%</span></div>
+      <div class="mixrow"><span class="mixl">Stroller 3.0</span><div class="mixbw"><div class="mixb" style="width:26.5%;background:var(--e1)"></div></div><span class="mixv" style="color:var(--e1)">107</span><span class="mixp">26%</span></div>
+      <div class="mixrow"><span class="mixl">2nd Seat Kit</span><div class="mixbw"><div class="mixb" style="width:17.8%;background:var(--e2)"></div></div><span class="mixv" style="color:var(--e2)">72</span><span class="mixp">18%</span></div>
+      <div class="mixrow"><span class="mixl">Bassinet</span><div class="mixbw"><div class="mixb" style="width:10.6%;background:var(--gold)"></div></div><span class="mixv" style="color:var(--gold)">43</span><span class="mixp">11%</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ DATA TAB ══ -->
+<div id="tab-data" class="tp">
+<div class="content">
+  <div class="panel mb18" style="overflow-x:auto">
+    <div class="ptitle">Amazon Funnel + Sessions Data — All 10 Weeks</div>
+    <div class="psub">Source: Amazon Seller Central · Purchase Tab + Business Reports</div>
+    <table class="dt">
+      <thead><tr><th>Metric</th><th>1/3</th><th>1/10</th><th>1/17</th><th>1/24</th><th>1/31</th><th>2/7</th><th>2/14</th><th>2/21</th><th class="e2c">2/28</th><th class="e3c">3/7</th></tr></thead>
+      <tbody>
+        <tr class="sr"><td colspan="11">Sessions &amp; Conversion</td></tr>
+        <tr><td>Platform Sessions (All)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="e2c">6,629</td><td>14,754</td></tr>
+        <tr><td>Stroller Sessions</td><td>5,603</td><td>6,422</td><td>6,495</td><td>6,680</td><td>6,639</td><td>6,402</td><td>6,689</td><td>3,755</td><td class="e2c">6,184</td><td>11,337</td></tr>
+        <tr><td>Platform CVR</td><td>0.52%</td><td>0.75%</td><td>0.75%</td><td>0.57%</td><td>0.62%</td><td>0.73%</td><td>0.60%</td><td>0.40%</td><td class="e2c hv">1.24%</td><td class="hv">2.67%</td></tr>
+        <tr><td>Strollers CVR</td><td>0.52%</td><td>0.75%</td><td>0.75%</td><td>0.57%</td><td>0.62%</td><td>0.73%</td><td>0.60%</td><td>0.40%</td><td class="e2c">0.73%</td><td>0.94%</td></tr>
+        <tr class="sr"><td colspan="11">Search Volume</td></tr>
+        <tr><td>Category Search</td><td>3,465</td><td>4,519</td><td>4,605</td><td>4,174</td><td>2,899</td><td>4,305</td><td>5,305</td><td>6,941</td><td class="e2c">6,760</td><td class="e3c">2,874</td></tr>
+        <tr><td>Brand Search ✓</td><td>4,299</td><td>5,049</td><td>5,019</td><td>4,888</td><td>4,544</td><td>4,272</td><td>4,162</td><td>5,640</td><td class="e2c hv">5,947</td><td class="e3c hv">5,833</td></tr>
+        <tr class="sr"><td colspan="11">Detail Page Views</td></tr>
+        <tr><td>Category PDP View</td><td>1,871</td><td>2,339</td><td>2,530</td><td>2,481</td><td>2,075</td><td>2,585</td><td>2,681</td><td>1,873</td><td class="e2c">2,641</td><td class="e3c">2,406</td></tr>
+        <tr><td>Brand Search PDP View</td><td>1,906</td><td>2,284</td><td>2,355</td><td>2,340</td><td>2,173</td><td>2,228</td><td>2,121</td><td>1,589</td><td class="e2c">2,789</td><td class="e3c bv">2,918</td></tr>
+        <tr><td>Total PDP Views</td><td>3,777</td><td>4,623</td><td>4,885</td><td>4,821</td><td>4,248</td><td>4,813</td><td>4,802</td><td>3,462</td><td class="e2c">5,430</td><td class="e3c bv">6,020</td></tr>
+        <tr><td>Total Viewed Drop Off ⚠</td><td>3,205</td><td>3,740</td><td>3,719</td><td>3,892</td><td>6,238</td><td class="wv">17,472</td><td class="wv">24,482</td><td>5,750</td><td class="e2c">3,625</td><td class="e3c">5,103</td></tr>
+        <tr class="sr"><td colspan="11">Cart &amp; Intent</td></tr>
+        <tr><td>Total PDP Add to Cart</td><td>231</td><td>248</td><td>241</td><td>270</td><td>262</td><td>226</td><td>209</td><td>124</td><td class="e2c">231</td><td class="e3c bv">638</td></tr>
+        <tr><td>Saved for Later</td><td>87</td><td>95</td><td>95</td><td>111</td><td>112</td><td>86</td><td>70</td><td>33</td><td class="e2c">58</td><td class="e3c bv">182 →retargeting 3/10</td></tr>
+        <tr><td>Add to Wish List</td><td>150</td><td>188</td><td>195</td><td>196</td><td>214</td><td>204</td><td>243</td><td>122</td><td class="e2c">140</td><td class="e3c bv">250</td></tr>
+        <tr class="sr"><td colspan="11">Purchase</td></tr>
+        <tr><td>Total Purchase</td><td>30</td><td>44</td><td>53</td><td>42</td><td>39</td><td>46</td><td>41</td><td class="wv">15</td><td class="e2c hv">63</td><td class="e3c bv">282</td></tr>
+        <tr><td>Repeat Customer</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="e2c">1</td><td class="e3c bv">5</td></tr>
+        <tr class="sr"><td colspan="11">Calculated CVRs</td></tr>
+        <tr><td>Brand Search → PDP</td><td>44.3%</td><td>45.2%</td><td>46.9%</td><td>47.9%</td><td>47.8%</td><td>52.1%</td><td>51.0%</td><td>28.2%</td><td class="e2c">46.9%</td><td class="e3c hv">50.0%</td></tr>
+        <tr><td>PDP → Add to Cart</td><td>6.1%</td><td>5.4%</td><td>4.9%</td><td>5.6%</td><td>6.2%</td><td>4.7%</td><td>4.4%</td><td>3.6%</td><td class="e2c">4.3%</td><td class="e3c bv">10.6%</td></tr>
+        <tr><td>Cart → Purchase</td><td>13.0%</td><td>17.7%</td><td>22.0%</td><td>15.6%</td><td>14.9%</td><td>20.4%</td><td>19.6%</td><td>12.1%</td><td class="e2c hv">27.3%</td><td class="e3c bv">44.2%</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:8px;font-size:9.5px;color:var(--tl);font-style:italic">✓ Brand Search consistent throughout · ⚠ Drop-off anomaly Feb 7–14 unexplained, excluded from CVR calcs · Stroller sessions = product-page sessions</div>
+  </div>
+  <div class="panel" style="overflow-x:auto">
+    <div class="ptitle">Sales &amp; Units + Ad Summary — All 10 Weeks</div>
+    <div class="psub">Source: 2026 Weekly Sales tracker + Amazon Campaign Manager</div>
+    <table class="dt">
+      <thead><tr><th>Metric</th><th>1/3</th><th>1/10</th><th>1/17</th><th>1/24</th><th>1/31</th><th>2/7</th><th>2/14</th><th>2/21</th><th class="e2c">2/28</th><th class="e3c">3/7</th></tr></thead>
+      <tbody>
+        <tr class="sr"><td colspan="11">Units Sold</td></tr>
+        <tr><td>Stroller 3.0 Units</td><td>29</td><td>48</td><td>49</td><td>38</td><td>41</td><td>47</td><td>40</td><td>15</td><td class="e2c">45</td><td class="e3c">107</td></tr>
+        <tr><td>Accessories (all types)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="e2c">39</td><td class="e3c bv">297</td></tr>
+        <tr><td>Total Units</td><td>29</td><td>48</td><td>49</td><td>38</td><td>41</td><td>47</td><td>40</td><td class="wv">15</td><td class="e2c hv">84</td><td class="e3c bv">404</td></tr>
+        <tr class="sr"><td colspan="11">Revenue</td></tr>
+        <tr><td>Stroller Revenue</td><td>$16,675</td><td>$27,600</td><td>$28,175</td><td>$21,850</td><td>$23,575</td><td>$27,025</td><td>$23,000</td><td class="wv">$8,625</td><td class="e2c">$24,939</td><td class="e3c hv">$58,194</td></tr>
+        <tr><td>Accessories Revenue</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="e2c">$3,450</td><td class="e3c bv">$28,580</td></tr>
+        <tr><td>Gross Sales</td><td>$16,675</td><td>$27,600</td><td>$28,175</td><td>$21,850</td><td>$23,575</td><td>$27,025</td><td>$23,000</td><td class="wv">$8,625</td><td class="e2c hv">$28,389</td><td class="e3c bv">$86,774</td></tr>
+        <tr><td># of Orders</td><td>29</td><td>48</td><td>49</td><td>38</td><td>41</td><td>47</td><td>40</td><td>15</td><td class="e2c">83</td><td class="e3c bv">394</td></tr>
+        <tr><td>AOV</td><td>$575</td><td>$575</td><td>$575</td><td>$575</td><td>$575</td><td>$575</td><td>$575</td><td>$575</td><td class="e2c">$342</td><td class="e3c">$220</td></tr>
+        <tr class="sr"><td colspan="11">Ad Performance</td></tr>
+        <tr><td>ACoS</td><td>33.3%</td><td>46.3%</td><td>30.1%</td><td class="wv">85.3%</td><td>43.4%</td><td>42.0%</td><td class="wv">84.7%</td><td class="wv">74.7%</td><td class="e2c hv">24.2%</td><td class="e3c bv">10.8%</td></tr>
+        <tr><td>Blended ROAS</td><td>9.69×</td><td>12.97×</td><td>12.51×</td><td>8.91×</td><td>9.44×</td><td>12.44×</td><td>6.75×</td><td class="wv">4.02×</td><td class="e2c hv">11.61×</td><td class="e3c bv">21.03×</td></tr>
+        <tr><td>CAC Per Stroller</td><td>$59.36</td><td>$44.33</td><td>$45.95</td><td>$64.57</td><td>$60.93</td><td>$46.23</td><td class="wv">$85.24</td><td class="wv">$143.09</td><td class="e2c hv">$47.72</td><td class="e3c bv">$25.86</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<div class="footer">
+  <span>Mockingbird Single-to-Double Stroller 3.0 · Amazon Brand Analytics · Jan–Mar 2026</span>
+  <span>FCW × Mockingbird · Amazon Management · Confidential</span>
+</div>
+
+<script>
+const W=['1/3','1/10','1/17','1/24','1/31','2/7','2/14','2/21','2/28','3/7'];
+const G='#9B7A3E',GL='#C4A265',E1='#C4A265',E2='#9B7A3E',E3='#4A7A55',TEAL='#1D7E9A';
+const TXT='#6B5B3E',BDR='#DDD5C4';
+const FF="'Jost',sans-serif";
+const EC=[E1,E1,E1,E1,E1,E1,E1,E1,E2,E3];
+const FLAT=Array(10).fill(E1); // same gold all weeks
+const D={
+  pur:[30,44,53,42,39,46,41,15,63,282],
+  catS:[3465,4519,4605,4174,2899,4305,5305,6941,6760,2874],
+  brS:[4299,5049,5019,4888,4544,4272,4162,5640,5947,5833],
+  catP:[1871,2339,2530,2481,2075,2585,2681,1873,2641,2406],
+  brP:[1906,2284,2355,2340,2173,2228,2121,1589,2789,2918],
+  atc:[231,248,241,270,262,226,209,124,231,638],
+  sl:[87,95,95,111,112,86,70,33,58,182],
+  wl:[150,188,195,196,214,204,243,122,140,250],
+  gs:[16675,27600,28175,21850,23575,27025,23000,8625,28389,86774],
+  strRev:[16675,27600,28175,21850,23575,27025,23000,8625,24939,58194],
+  accRev:[0,0,0,0,0,0,0,0,3450,28580],
+  strU:[29,48,49,38,41,47,40,15,45,107],
+  accU:[0,0,0,0,0,0,0,0,39,297],
+  acos:[33.27,46.26,30.12,85.34,43.44,41.99,84.71,74.65,24.23,10.81],
+  roas:[9.69,12.97,12.51,8.91,9.44,12.44,6.75,4.02,11.61,21.03],
+  spend:[1721.58,2127.73,2251.34,2453.55,2497.95,2172.99,3409.58,2146.32,2147.34,2766.80],
+  adSal:[5175,4600,7475,2875,5750,5175,4025,2875,8863,25600],
+  cac:[59.36,44.33,45.95,64.57,60.93,46.23,85.24,143.09,47.72,25.86],
+  platSess:[null,null,null,null,null,null,null,null,6629,14754],
+  strSess:[5603,6422,6495,6680,6639,6402,6689,3755,6184,11337],
+  platCVR:[0.52,0.75,0.75,0.57,0.62,0.73,0.60,0.40,1.24,2.67],
+  strCVR:[0.52,0.75,0.75,0.57,0.62,0.73,0.60,0.40,0.73,0.94]
+};
+const BASE={
+  responsive:true,maintainAspectRatio:false,
+  plugins:{
+    legend:{labels:{font:{family:FF,size:10},color:TXT,boxWidth:10,padding:10}},
+    tooltip:{backgroundColor:'#FAF7F3',titleColor:'#2C2416',bodyColor:TXT,borderColor:BDR,borderWidth:1,titleFont:{family:FF,size:11},bodyFont:{family:FF,size:12,weight:'600'},padding:9}
+  },
+  scales:{
+    x:{grid:{color:'rgba(221,213,196,0.35)'},ticks:{font:{family:FF,size:9.5},color:TXT}},
+    y:{grid:{color:'rgba(221,213,196,0.35)'},ticks:{font:{family:FF,size:9.5},color:TXT}}
+  }
+};
+const EVP={id:'evl',afterDatasetsDraw(c){
+  const{ctx,scales:{x,y}}=c;if(!x||!y)return;
+  ctx.save();
+  [{i:8,col:E2,l:'Launch 2/24'},{i:9,col:E3,l:'FCW 3/1'}].forEach(ev=>{
+    const px=x.getPixelForValue(ev.i);
+    ctx.strokeStyle=ev.col;ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.moveTo(px,y.top);ctx.lineTo(px,y.bottom);ctx.stroke();
+    ctx.setLineDash([]);ctx.fillStyle=ev.col;ctx.font=`9.5px ${FF}`;
+    ctx.fillText(ev.l,px+3,y.top+11);
+  });ctx.restore();
+}};
+const mk=(id,cfg)=>{if(document.getElementById(id))new Chart(document.getElementById(id),cfg);};
+const ys=v=>`$${(v/1000).toFixed(0)}k`,yp=v=>v+'%',yx=v=>v+'×';
+
+// GROSS SALES stacked
+mk('cSales',{type:'bar',plugins:[EVP],data:{labels:W,datasets:[
+  {label:'Stroller Revenue',data:D.strRev,backgroundColor:Array(10).fill(E1+'BB'),borderColor:Array(10).fill(E1),borderWidth:1.5,borderRadius:3},
+  {label:'Accessories',data:D.accRev,backgroundColor:'rgba(29,126,154,0.5)',borderColor:TEAL,borderWidth:1.5,borderRadius:3}
+]},options:{...BASE,scales:{...BASE.scales,x:{...BASE.scales.x,stacked:true},y:{...BASE.scales.y,stacked:true,ticks:{...BASE.scales.y.ticks,callback:ys}}}}});
+
+// SESSIONS dual axis
+mk('cSessions',{type:'bar',plugins:[EVP],data:{labels:W,datasets:[
+  {label:'Stroller Sessions',data:D.strSess,backgroundColor:Array(10).fill(E1+'77'),borderColor:Array(10).fill(E1),borderWidth:1.5,borderRadius:3,yAxisID:'yBar'},
+  {label:'Platform CVR %',data:D.platCVR,type:'line',borderColor:G,backgroundColor:'transparent',borderWidth:2.5,tension:.3,pointRadius:5,pointBackgroundColor:G,yAxisID:'yLine'},
+  {label:'Strollers CVR %',data:D.strCVR,type:'line',borderColor:TEAL,backgroundColor:'transparent',borderWidth:2,tension:.3,pointRadius:4,pointBackgroundColor:TEAL,borderDash:[4,2],yAxisID:'yLine'}
+]},options:{...BASE,scales:{
+  x:{...BASE.scales.x},
+  yBar:{...BASE.scales.y,position:'left',ticks:{...BASE.scales.y.ticks,callback:v=>v>=1000?`${(v/1000).toFixed(0)}k`:v}},
+  yLine:{position:'right',grid:{drawOnChartArea:false},ticks:{font:{family:FF,size:9.5},color:TEAL,callback:yp}}
+}}});
+
+// PURCHASE trend
+mk('cPurch',{type:'line',plugins:[EVP],data:{labels:W,datasets:[{label:'Total Purchases',data:D.pur,borderColor:G,backgroundColor:'rgba(155,122,62,0.07)',pointBackgroundColor:EC,pointRadius:5,pointHoverRadius:7,borderWidth:2.5,fill:false,tension:.3}]},options:{...BASE,plugins:{...BASE.plugins,legend:{display:false}}}});
+
+// UNITS stacked
+mk('cUnits',{type:'bar',data:{labels:W,datasets:[
+  {label:'Stroller 3.0',data:D.strU,backgroundColor:Array(10).fill(E1+'CC'),borderColor:Array(10).fill(E1),borderWidth:1,borderRadius:2},
+  {label:'Accessories (all)',data:D.accU,backgroundColor:'rgba(29,126,154,0.6)',borderColor:TEAL,borderWidth:1,borderRadius:2}
+]},options:{...BASE,scales:{...BASE.scales,x:{...BASE.scales.x,stacked:true},y:{...BASE.scales.y,stacked:true}}}});
+
+// BRAND vs GENERIC ROAS
+mk('cBgRoas',{type:'bar',data:{labels:['Jan','Feb','Mar'],datasets:[
+  {label:'Brand ROAS',data:[3.15,3.96,20.56],backgroundColor:Array(3).fill(E1+'99'),borderColor:Array(3).fill(E1),borderWidth:2,borderRadius:4},
+  {label:'Generic ROAS',data:[0.75,0.35,2.44],backgroundColor:Array(3).fill(TEAL+'66'),borderColor:Array(3).fill(TEAL),borderWidth:2,borderRadius:4}
+]},options:{...BASE,scales:{...BASE.scales,y:{...BASE.scales.y,ticks:{...BASE.scales.y.ticks,callback:yx}}}}});
+
+// BRAND vs GENERIC SALES
+mk('cBgSales',{type:'bar',data:{labels:['Jan','Feb','Mar'],datasets:[
+  {label:'Brand Ad Sales',data:[14950,19788,37248],backgroundColor:Array(3).fill(E1+'99'),borderColor:Array(3).fill(E1),borderWidth:2,borderRadius:4},
+  {label:'Generic Ad Sales',data:[2875,1699,7674],backgroundColor:Array(3).fill(TEAL+'66'),borderColor:Array(3).fill(TEAL),borderWidth:2,borderRadius:4}
+]},options:{...BASE,scales:{...BASE.scales,y:{...BASE.scales.y,ticks:{...BASE.scales.y.ticks,callback:ys}}}}});
+
+// ACOS
+mk('cAcos',{type:'line',plugins:[EVP],data:{labels:W,datasets:[{label:'ACoS %',data:D.acos,borderColor:'#A84848',backgroundColor:'rgba(168,72,72,0.07)',pointBackgroundColor:EC,fill:true,borderWidth:2.5,tension:.3,pointRadius:5}]},options:{...BASE,plugins:{...BASE.plugins,legend:{display:false}},scales:{...BASE.scales,y:{...BASE.scales.y,ticks:{...BASE.scales.y.ticks,callback:yp}}}}});
+
+// ROAS
+mk('cRoas',{type:'line',plugins:[EVP],data:{labels:W,datasets:[{label:'Blended ROAS',data:D.roas,borderColor:E3,backgroundColor:'rgba(74,122,85,0.08)',pointBackgroundColor:EC,fill:true,borderWidth:2.5,tension:.3,pointRadius:5}]},options:{...BASE,plugins:{...BASE.plugins,legend:{display:false}},scales:{...BASE.scales,y:{...BASE.scales.y,ticks:{...BASE.scales.y.ticks,callback:yx}}}}});
+
+// SPEND vs SALES
+mk('cSpend',{type:'bar',plugins:[EVP],data:{labels:W,datasets:[
+  {label:'Ad Spend',data:D.spend,backgroundColor:Array(10).fill(E1+'88'),borderColor:Array(10).fill(E1),borderWidth:1.5,borderRadius:3},
+  {label:'Attributed Sales',data:D.adSal,type:'line',borderColor:TEAL,backgroundColor:'transparent',borderWidth:2.5,tension:.3,pointRadius:4,pointBackgroundColor:TEAL}
+]},options:{...BASE,scales:{...BASE.scales,y:{...BASE.scales.y,ticks:{...BASE.scales.y.ticks,callback:ys}}}}});
+
+// CAC
+mk('cCac',{type:'bar',plugins:[EVP],data:{labels:W,datasets:[{label:'CAC Per Stroller',data:D.cac,backgroundColor:Array(10).fill(E1+'99'),borderColor:Array(10).fill(E1),borderWidth:1.5,borderRadius:3}]},options:{...BASE,plugins:{...BASE.plugins,legend:{display:false}},scales:{...BASE.scales,y:{...BASE.scales.y,ticks:{...BASE.scales.y.ticks,callback:v=>'$'+v}}}}});
+
+// SESSIONS FULL (funnel tab)
+mk('cSessionsFull',{type:'bar',plugins:[EVP],data:{labels:W,datasets:[
+  {label:'Stroller Sessions',data:D.strSess,backgroundColor:Array(10).fill(E1+'77'),borderColor:Array(10).fill(E1),borderWidth:1.5,borderRadius:3,yAxisID:'yBar'},
+  {label:'Platform CVR %',data:D.platCVR,type:'line',borderColor:G,backgroundColor:'transparent',borderWidth:2.5,tension:.3,pointRadius:5,pointBackgroundColor:G,yAxisID:'yLine'},
+  {label:'Strollers CVR %',data:D.strCVR,type:'line',borderColor:TEAL,backgroundColor:'transparent',borderWidth:2,tension:.3,pointRadius:4,pointBackgroundColor:TEAL,borderDash:[4,2],yAxisID:'yLine'}
+]},options:{...BASE,scales:{
+  x:{...BASE.scales.x},
+  yBar:{...BASE.scales.y,position:'left',ticks:{...BASE.scales.y.ticks,callback:v=>v>=1000?`${(v/1000).toFixed(0)}k`:v}},
+  yLine:{position:'right',grid:{drawOnChartArea:false},ticks:{font:{family:FF,size:9.5},color:TEAL,callback:yp}}
+}}});
+
+// CONV
+mk('cConv',{type:'line',plugins:[EVP],data:{labels:W,datasets:[
+  {label:'PDP → ATC %',data:W.map((_,i)=>{const p=D.catP[i]+D.brP[i];return+(D.atc[i]/p*100).toFixed(1);}),borderColor:GL,backgroundColor:'transparent',borderWidth:2,tension:.3,pointRadius:4,borderDash:[4,2]},
+  {label:'Cart → Purchase %',data:W.map((_,i)=>+(D.pur[i]/D.atc[i]*100).toFixed(1)),borderColor:E3,backgroundColor:'transparent',borderWidth:2.5,tension:.3,pointRadius:5}
+]},options:{...BASE,scales:{...BASE.scales,y:{...BASE.scales.y,ticks:{...BASE.scales.y.ticks,callback:yp}}}}});
+
+// PDP
+mk('cPdp',{type:'line',plugins:[EVP],data:{labels:W,datasets:[
+  {label:'Brand PDP Views',data:D.brP,borderColor:TEAL,backgroundColor:'transparent',borderWidth:3,tension:.3,pointRadius:5,pointBackgroundColor:TEAL},
+  {label:'Category PDP Views',data:D.catP,borderColor:GL,backgroundColor:'transparent',borderWidth:2,tension:.3,pointRadius:4,pointBackgroundColor:GL,borderDash:[5,3]}
+]},options:{...BASE}});
+
+// ERA SALES
+mk('cEraSales',{type:'bar',plugins:[EVP],data:{labels:W,datasets:[
+  {label:'Stroller Revenue',data:D.strRev,backgroundColor:Array(10).fill(E1+'AA'),borderColor:Array(10).fill(E1),borderWidth:2,borderRadius:3},
+  {label:'Accessories',data:D.accRev,backgroundColor:'rgba(29,126,154,0.55)',borderColor:TEAL,borderWidth:2,borderRadius:3}
+]},options:{...BASE,scales:{...BASE.scales,x:{...BASE.scales.x,stacked:true},y:{...BASE.scales.y,stacked:true,ticks:{...BASE.scales.y.ticks,callback:ys}}}}});
+
+function switchTab(id,btn){
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
