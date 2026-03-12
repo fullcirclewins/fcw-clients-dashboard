@@ -1,298 +1,612 @@
-import { useState } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockingbird – Brand Store Performance · 3-Phase Redesign</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#F2EDE3;font-family:'Jost',sans-serif;color:#1C1A17}
+:root{
+  --bg:#F2EDE3;--surface:#FFFFFF;--surf2:#EDE7D9;--border:#DDD5C4;
+  --text:#1C1A17;--muted:#7A6E5F;--dim:#A89880;--header:#7A6650;
+  --gold:#B8962E;--tan:#C4AD8F;--blue:#8BA8BE;--brown:#9E7D5E;
+  --warn:#A04040;--p3bar:#8B6F52;
+  --serif:'Cormorant Garamond',serif;--sans:'Jost',sans-serif;
+}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:30px 48px;display:flex;justify-content:space-between;align-items:flex-start}
+.heyebrow{font-size:10px;color:var(--dim);letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px}
+.htitle{font-family:var(--serif);font-size:30px;font-weight:700;color:var(--text);line-height:1.1}
+.hsubtitle{font-family:var(--serif);font-size:30px;font-weight:400;color:var(--gold)}
+.hmeta{font-size:11px;color:var(--dim);line-height:2.1;text-align:right}
+.events{background:var(--surf2);border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr 1fr}
+.ev{padding:14px 22px;border-right:1px solid var(--border);display:flex;gap:12px;align-items:flex-start}
+.ev:last-child{border-right:none}
+.evicon{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px}
+.evtag{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;margin-bottom:3px}
+.evtitle{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
+.evdesc{font-size:10px;color:var(--muted);line-height:1.55}
+.evdate{font-size:9.5px;color:var(--dim);margin-top:3px;font-style:italic}
 
-const C = {
-  bg:      "#F2EDE3",
-  surface: "#FFFFFF",
-  surf2:   "#EDE7D9",
-  border:  "#DDD5C4",
-  text:    "#1C1A17",
-  muted:   "#7A6E5F",
-  dim:     "#A89880",
-  header:  "#7A6650",
-  gold:    "#B8962E",
-  tan:     "#C4AD8F",
-  blue:    "#8BA8BE",
-  brown:   "#9E7D5E",
-  warn:    "#A04040",
-  p3bar:   "#8B6F52",
-};
+.kpis{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border);background:var(--surface)}
+.kpi{padding:16px 18px;border-right:1px solid var(--border)}
+.kpi:last-child{border-right:none}
+.kpi-label{font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.kpi-value{font-size:24px;font-family:var(--serif);font-weight:600;color:var(--text);line-height:1.1;margin-bottom:4px}
+.kpi-sub{font-size:9.5px;color:var(--muted)}
+.kpi-note{font-size:9.5px;margin-top:4px;font-weight:600}
 
-const bc = (i) => [C.tan, C.blue, C.p3bar][i];
+.tabs{background:var(--surf2);border-bottom:1px solid var(--border);padding:10px 48px;display:flex;gap:8px}
+.tbtn{font-family:var(--sans);font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:9px 20px;border-radius:4px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;transition:all .18s}
+.tbtn:hover{background:var(--surf2);border-color:var(--gold);color:var(--gold)}
+.tbtn.active{background:var(--gold);border-color:var(--gold);color:var(--surface);box-shadow:0 2px 8px rgba(184,150,46,.25)}
 
-const phases = [
-  {
-    id: "P1", tag: "PHASE 1 · 60 DAYS", label: "Jan 1 – Mar 1",
-    subtitle: "Stroller 2.0",
-    desc: "Stroller 2.0 only. Single-page store, Home only. No accessories, flat performance baseline.",
-    sales: 26074, dailySales: 434, orders: 61, units: 64,
-    visitors: 6127, salesPerVisitor: 4.26, unitsPerOrder: 1.05,
-    dwellTime: "40s", viewsPerVisitor: 1.52, aov: 427.44, delta: null,
-    topPages: [
-      { name: "Home", sales: 26074, orders: 61, visits: 7442, views: 9316, dwell: "40s" },
-    ],
-  },
-  {
-    id: "P2", tag: "PHASE 2 · 5 DAYS", label: "Mar 2 – Mar 6",
-    subtitle: "Stroller 3.0 + Accessories Launch",
-    desc: "Stroller 3.0 + full accessory catalog launched. Single-page store — Home driving nearly all revenue. Sub-pages live but not yet converting.",
-    sales: 14535, dailySales: 2907, orders: 38, units: 53,
-    visitors: 757, salesPerVisitor: 19.20, unitsPerOrder: 1.39,
-    dwellTime: "56s", viewsPerVisitor: 1.48, aov: 382.50, delta: "6.7x daily rev vs P1",
-    topPages: [
-      { name: "Home",             sales: 14375, orders: 37, visits: 945, views: 1091, dwell: "56s" },
-      { name: "Bassinet",         sales: 160,   orders: 1,  visits: 3,   views: 3,    dwell: "40s" },
-      { name: "The Stroller",     sales: 0,     orders: 0,  visits: 3,   views: 3,    dwell: "70s" },
-      { name: "2nd Seat Attach.", sales: 0,     orders: 0,  visits: 4,   views: 5,    dwell: "53s" },
-      { name: "Car Seat Adapter", sales: 0,     orders: 0,  visits: 7,   views: 7,    dwell: "123s" },
-      { name: "Shop All",         sales: 0,     orders: 0,  visits: 5,   views: 8,    dwell: "99s" },
-    ],
-  },
-  {
-    id: "P3", tag: "PHASE 3 · 4 DAYS", label: "Mar 7 – Mar 10",
-    subtitle: "Full Store Build-Out",
-    desc: "Full store build-out live. 6 pages converting. Home drops from 100% to 49% of revenue — catalog pages now driving meaningful sales.",
-    sales: 11317, dailySales: 2829, orders: 28, units: 49,
-    visitors: 960, salesPerVisitor: 11.79, unitsPerOrder: 1.75,
-    dwellTime: "56s", viewsPerVisitor: 2.94, aov: 404.18, delta: "6.5x daily rev vs P1",
-    topPages: [
-      { name: "Home",             sales: 5598, orders: 8,  visits: 1220, views: 1290, dwell: "48s" },
-      { name: "Shop All",         sales: 2232, orders: 6,  visits: 341,  views: 382,  dwell: "30s" },
-      { name: "The Stroller",     sales: 1647, orders: 2,  visits: 299,  views: 326,  dwell: "44s" },
-      { name: "2nd Seat Attach.", sales: 1050, orders: 6,  visits: 264,  views: 281,  dwell: "48s" },
-      { name: "Bassinet",         sales: 640,  orders: 3,  visits: 255,  views: 276,  dwell: "31s" },
-      { name: "Car Seat Adapter", sales: 150,  orders: 3,  visits: 258,  views: 271,  dwell: "42s" },
-    ],
-  },
-];
+.content{padding:28px 48px}
+.tp{display:none}.tp.active{display:block}
 
-const kpis = [
-  { label: "DAILY REV LIFT",     value: "6.7x",   sub: "P2 vs P1 baseline",      note: "strong momentum",    nc: "#9E7D5E" },
-  { label: "SALES/VISITOR PEAK", value: "$19.20", sub: "P2 vs $4.26 in P1",       note: "new benchmark set",  nc: "#9E7D5E" },
-  { label: "UNITS/ORDER PEAK",   value: "1.75x",  sub: "P3 full store build-out", note: "cross-sell working",  nc: "#9E7D5E" },
-  { label: "PAGES CONVERTING",   value: "6x",     sub: "P3 vs 1 in P1-P2",        note: "store maturing",     nc: "#9E7D5E" },
-  { label: "AOV - P1",           value: "$427",   sub: "Baseline",                 note: "establish benchmark",nc: "#A89880" },
-  { label: "AOV - P2",           value: "$383",   sub: "Launch period",            note: "accessory mix drag",  nc: "#A04040" },
-  { label: "AOV - P3",           value: "$404",   sub: "Recovering post-launch",   note: "trending back up",   nc: "#9E7D5E" },
-];
+/* Overview cards */
+.ov-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.ov-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(44,36,22,.05)}
+.ov-head{background:var(--surf2);padding:14px 18px 12px;border-bottom:1px solid var(--border)}
+.ov-tag{font-size:9px;color:var(--gold);font-weight:600;letter-spacing:.15em;text-transform:uppercase}
+.ov-name{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--text);margin-top:4px}
+.ov-dates{font-size:9.5px;color:var(--dim);margin-top:3px;font-style:italic}
+.ov-body{padding:16px 18px}
+.ov-big{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--text)}
+.ov-daily{font-size:9.5px;color:var(--muted);margin-bottom:14px}
+.bar-bg{background:var(--surf2);border-radius:3px;height:4px;margin-bottom:4px}
+.bar-fill{height:100%;border-radius:3px}
+.bar-label{font-size:9.5px;color:var(--dim);margin-bottom:16px}
+.ov-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px 0}
+.ov-stat-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.1em}
+.ov-stat-val{font-family:var(--serif);font-size:16px;font-weight:600}
+.ov-delta{margin-top:14px;background:#F0E8DC;border:1px solid var(--border);border-radius:3px;padding:5px 10px;font-size:9.5px;color:var(--brown);font-weight:600}
 
-const noteArrow = (nc) => nc === "#A04040" ? "▼" : nc === "#A89880" ? "—" : "▲";
+/* Metrics */
+.met-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.met-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:22px 24px;box-shadow:0 2px 12px rgba(44,36,22,.05)}
+.met-title{font-size:9px;color:var(--gold);font-weight:600;letter-spacing:.15em;text-transform:uppercase;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:10px}
+.met-row{margin-bottom:16px}
+.met-row-top{display:flex;justify-content:space-between;margin-bottom:6px}
+.met-label{font-size:10.5px;color:var(--muted)}
+.met-val{font-family:var(--serif);font-size:16px;font-weight:600}
+.met-bar{background:var(--surf2);border-radius:3px;height:6px}
+.met-bar-fill{height:100%;border-radius:3px}
 
-const metrics = [
-  { key: "dailySales",      label: "Daily Revenue",    fmt: (v) => "$" + v.toLocaleString() },
-  { key: "salesPerVisitor", label: "Sales / Visitor",  fmt: (v) => "$" + v.toFixed(2) },
-  { key: "aov",             label: "AOV (Sales/Order)", fmt: (v) => "$" + v.toFixed(2) },
-  { key: "viewsPerVisitor", label: "Views / Visitor",  fmt: (v) => v.toFixed(2) },
-];
+/* Pages */
+.pg-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px;box-shadow:0 2px 12px rgba(44,36,22,.05)}
+.pg-card:last-child{margin-bottom:0}
+.pg-head{background:var(--surf2);padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.pg-head-left .ov-tag{margin-bottom:0}
+.pg-head-left .ov-name{margin-top:2px}
+.pg-head-left .ov-name span{font-weight:400;color:var(--dim);font-size:12px}
+.pg-stats{display:flex;gap:28px}
+.pg-stat{text-align:right}
+.pg-stat-label{font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase}
+.pg-stat-val{font-family:var(--serif);font-size:16px;font-weight:600}
+.pg-th{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;gap:8px;padding:9px 20px;border-bottom:2px solid var(--border);background:var(--bg)}
+.pg-th span{font-size:9px;color:var(--dim);font-weight:600;letter-spacing:.09em;text-transform:uppercase}
+.pg-rows{padding:0 20px 4px}
+.pg-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;gap:8px;padding:7px 0;align-items:center;border-bottom:1px solid var(--border)}
+.pg-row:last-child{border-bottom:none}
+.pg-row-name{font-size:11px}
+.pg-row-name.has-sales{font-weight:500;color:var(--text)}
+.pg-row-name.no-sales{font-weight:400;color:var(--dim)}
+.pg-cell{font-size:11px;color:var(--muted)}
+.pg-cell.active{color:var(--text)}
+.pg-cell.inactive{color:var(--dim)}
+.mini-bar{background:var(--surf2);border-radius:3px;height:3px;margin-top:4px;width:80%}
+.mini-bar-fill{height:100%;border-radius:3px}
+.pg-footer{background:#F0E8DC;border-top:1px solid var(--border);padding:9px 20px;display:flex;gap:32px;flex-wrap:wrap}
+.pg-footer span{font-size:9.5px;color:var(--brown);font-weight:600}
 
-export default function BrandStoreInsights() {
-  const [tab, setTab] = useState("OVERVIEW");
-  const maxDaily = Math.max(...phases.map((d) => d.dailySales));
+.footer{border-top:1px solid var(--border);background:var(--surface);padding:12px 48px;display:flex;justify-content:space-between;align-items:center}
+.footer span{font-size:10px;color:var(--dim);letter-spacing:.06em}
+</style>
+</head>
+<body>
 
-  const mono = "DM Mono, monospace";
-  const serif = "Georgia, serif";
-  const sans = "'DM Sans', 'Segoe UI', sans-serif";
+<!-- Header -->
+<div class="header">
+  <div>
+    <div class="heyebrow">FCW x Mockingbird · Amazon Brand Store</div>
+    <div class="htitle">Brand Store Performance</div>
+    <div class="hsubtitle">3-Phase Redesign Analysis · Jan 1 – Mar 10, 2026</div>
+  </div>
+  <div>
+    <div class="hmeta">Mockingbird Brand Store<br>Amazon Seller Central · Jan 1 – Mar 10, 2026</div>
+  </div>
+</div>
 
-  return (
-    <div style={{ fontFamily: sans, background: C.bg, minHeight: "100vh", color: C.text }}>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" />
-      <style>{`*{box-sizing:border-box;margin:0;padding:0;}`}</style>
+<!-- Phase Events -->
+<div class="events">
+  <div class="ev">
+    <div class="evicon" style="background:#F5EFE4">📦</div>
+    <div>
+      <div class="evtag" style="color:var(--tan)">Phase 1 · Jan 1 – Mar 1 · 60 Days</div>
+      <div class="evtitle">Stroller 2.0</div>
+      <div class="evdesc">Stroller 2.0 only. Single-page store, Home only. No accessories, flat performance baseline.</div>
+      <div class="evdate">$434/day avg · $26,074 total · 61 orders · $427 AOV</div>
+    </div>
+  </div>
+  <div class="ev">
+    <div class="evicon" style="background:#EAF0F4">🚀</div>
+    <div>
+      <div class="evtag" style="color:var(--blue)">Phase 2 · Mar 2 – Mar 6 · 5 Days</div>
+      <div class="evtitle">Stroller 3.0 + Accessories Launch</div>
+      <div class="evdesc">Stroller 3.0 + full accessory catalog launched. Single-page store — Home driving nearly all revenue. Sub-pages live but not yet converting.</div>
+      <div class="evdate">$2,907/day avg · $14,535 total · 38 orders · $383 AOV</div>
+    </div>
+  </div>
+  <div class="ev">
+    <div class="evicon" style="background:#F0E8DC">⚡</div>
+    <div>
+      <div class="evtag" style="color:var(--p3bar)">Phase 3 · Mar 7 – Mar 10 · 4 Days</div>
+      <div class="evtitle">Full Store Build-Out</div>
+      <div class="evdesc">Full store build-out live. 6 pages converting. Home drops from 100% to 49% of revenue — catalog pages now driving meaningful sales.</div>
+      <div class="evdate">$2,829/day avg · $11,317 total · 28 orders · $404 AOV</div>
+    </div>
+  </div>
+</div>
 
-      {/* Eyebrow */}
-      <div style={{ background: C.header, padding: "7px 28px", fontSize: 10, color: "#E8D8C8", letterSpacing: "0.2em", fontFamily: mono, textTransform: "uppercase" }}>
-        FCW x Mockingbird · Amazon Brand Store
-      </div>
+<!-- KPI strip -->
+<div class="kpis">
+  <div class="kpi">
+    <div class="kpi-label">DAILY REV LIFT</div>
+    <div class="kpi-value">6.7x</div>
+    <div class="kpi-sub">P2 vs P1 baseline</div>
+    <div class="kpi-note" style="color:#9E7D5E">▲ strong momentum</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">SALES/VISITOR PEAK</div>
+    <div class="kpi-value">$19.20</div>
+    <div class="kpi-sub">P2 vs $4.26 in P1</div>
+    <div class="kpi-note" style="color:#9E7D5E">▲ new benchmark set</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">UNITS/ORDER PEAK</div>
+    <div class="kpi-value">1.75x</div>
+    <div class="kpi-sub">P3 full store build-out</div>
+    <div class="kpi-note" style="color:#9E7D5E">▲ cross-sell working</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">PAGES CONVERTING</div>
+    <div class="kpi-value">6x</div>
+    <div class="kpi-sub">P3 vs 1 in P1-P2</div>
+    <div class="kpi-note" style="color:#9E7D5E">▲ store maturing</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">AOV - P1</div>
+    <div class="kpi-value">$427</div>
+    <div class="kpi-sub">Baseline</div>
+    <div class="kpi-note" style="color:#A89880">— establish benchmark</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">AOV - P2</div>
+    <div class="kpi-value">$383</div>
+    <div class="kpi-sub">Launch period</div>
+    <div class="kpi-note" style="color:#A04040">▼ accessory mix drag</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">AOV - P3</div>
+    <div class="kpi-value">$404</div>
+    <div class="kpi-sub">Recovering post-launch</div>
+    <div class="kpi-note" style="color:#9E7D5E">▲ trending back up</div>
+  </div>
+</div>
 
-      {/* Header */}
-      <div style={{ padding: "22px 28px 0", borderBottom: "1px solid " + C.border }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
-          <div>
-            <div style={{ fontSize: 11, color: C.muted, fontFamily: mono, letterSpacing: "0.12em", marginBottom: 4 }}>FCW x MOCKINGBIRD</div>
-            <h1 style={{ fontFamily: serif, fontSize: 28, fontWeight: 400, color: C.text, letterSpacing: "-0.3px", lineHeight: 1.1 }}>Brand Store Performance</h1>
-            <p style={{ fontFamily: serif, fontSize: 14, color: C.muted, fontStyle: "italic", marginTop: 4 }}>3-Phase Redesign Analysis · Jan 1 – Mar 10, 2026</p>
-          </div>
-          <div style={{ textAlign: "right", fontSize: 11, color: C.muted, fontFamily: mono, lineHeight: 1.8 }}>
-            Mockingbird Brand Store<br />Amazon Seller Central · Jan 1 – Mar 10, 2026
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tbtn active" onclick="switchTab('OVERVIEW')">OVERVIEW</button>
+  <button class="tbtn" onclick="switchTab('METRICS')">METRICS</button>
+  <button class="tbtn" onclick="switchTab('PAGES')">PAGES</button>
+</div>
+
+<!-- Content -->
+<div class="content">
+
+  <!-- OVERVIEW TAB -->
+  <div id="tab-OVERVIEW" class="tp active">
+    <div class="ov-grid">
+      <!-- P1 -->
+      <div class="ov-card">
+        <div class="ov-head">
+          <div class="ov-tag">PHASE 1 · 60 DAYS</div>
+          <div class="ov-name">Stroller 2.0</div>
+          <div class="ov-dates">Jan 1 – Mar 1</div>
+        </div>
+        <div class="ov-body">
+          <div class="ov-big">$26,074</div>
+          <div class="ov-daily">$434 / day avg</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:14.93%;background:#C4AD8F"></div></div>
+          <div class="bar-label">daily revenue vs peak</div>
+          <div class="ov-stats">
+            <div><div class="ov-stat-label">Orders</div><div class="ov-stat-val">61</div></div>
+            <div><div class="ov-stat-label">Units</div><div class="ov-stat-val">64</div></div>
+            <div><div class="ov-stat-label">Visitors</div><div class="ov-stat-val">6,127</div></div>
+            <div><div class="ov-stat-label">Dwell</div><div class="ov-stat-val">40s</div></div>
+            <div><div class="ov-stat-label">AOV</div><div class="ov-stat-val">$427.44</div></div>
+            <div><div class="ov-stat-label">Sales/Vis</div><div class="ov-stat-val">$4.26</div></div>
           </div>
         </div>
-
-        {/* Phase strip */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr" }}>
-          {phases.map((p, i) => (
-            <div key={p.id} style={{
-              background: i === 2 ? C.surf2 : i === 1 ? "#F5F0E8" : C.bg,
-              borderTop: "3px solid " + bc(i),
-              borderRight: i < 2 ? "1px solid " + C.border : "none",
-              padding: "14px 18px",
-            }}>
-              <div style={{ fontSize: 10, color: C.gold, fontFamily: mono, letterSpacing: "0.15em", marginBottom: 3 }}>{p.tag}</div>
-              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 3 }}>{p.subtitle}</div>
-              <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.5 }}>{p.desc}</div>
-              <div style={{ fontSize: 11, color: C.muted, marginTop: 5, fontFamily: mono }}>
-                {p.label} · <span style={{ color: C.text, fontWeight: 500 }}>${p.sales.toLocaleString()} total</span>
-              </div>
-            </div>
-          ))}
+      </div>
+      <!-- P2 -->
+      <div class="ov-card">
+        <div class="ov-head">
+          <div class="ov-tag">PHASE 2 · 5 DAYS</div>
+          <div class="ov-name">Stroller 3.0 + Accessories Launch</div>
+          <div class="ov-dates">Mar 2 – Mar 6</div>
+        </div>
+        <div class="ov-body">
+          <div class="ov-big">$14,535</div>
+          <div class="ov-daily">$2,907 / day avg</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:100%;background:#8BA8BE"></div></div>
+          <div class="bar-label">daily revenue vs peak</div>
+          <div class="ov-stats">
+            <div><div class="ov-stat-label">Orders</div><div class="ov-stat-val">38</div></div>
+            <div><div class="ov-stat-label">Units</div><div class="ov-stat-val">53</div></div>
+            <div><div class="ov-stat-label">Visitors</div><div class="ov-stat-val">757</div></div>
+            <div><div class="ov-stat-label">Dwell</div><div class="ov-stat-val">56s</div></div>
+            <div><div class="ov-stat-label">AOV</div><div class="ov-stat-val">$382.50</div></div>
+            <div><div class="ov-stat-label">Sales/Vis</div><div class="ov-stat-val">$19.20</div></div>
+          </div>
+          <div class="ov-delta">▲ 6.7x daily rev vs P1</div>
         </div>
       </div>
-
-      {/* KPI strip */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", borderBottom: "1px solid " + C.border, background: C.surface }}>
-        {kpis.map((k, i) => (
-          <div key={i} style={{ padding: "18px 16px", borderRight: i < 6 ? "1px solid " + C.border : "none" }}>
-            <div style={{ fontSize: 9, color: C.dim, letterSpacing: "0.14em", fontFamily: mono, textTransform: "uppercase", marginBottom: 8 }}>{k.label}</div>
-            <div style={{ fontSize: 26, fontFamily: serif, fontWeight: 400, color: C.text, lineHeight: 1, marginBottom: 6 }}>{k.value}</div>
-            <div style={{ fontSize: 11, color: C.muted }}>{k.sub}</div>
-            <div style={{ fontSize: 10, color: k.nc, marginTop: 4, fontFamily: mono }}>{noteArrow(k.nc)} {k.note}</div>
+      <!-- P3 -->
+      <div class="ov-card">
+        <div class="ov-head">
+          <div class="ov-tag">PHASE 3 · 4 DAYS</div>
+          <div class="ov-name">Full Store Build-Out</div>
+          <div class="ov-dates">Mar 7 – Mar 10</div>
+        </div>
+        <div class="ov-body">
+          <div class="ov-big">$11,317</div>
+          <div class="ov-daily">$2,829 / day avg</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:97.32%;background:#8B6F52"></div></div>
+          <div class="bar-label">daily revenue vs peak</div>
+          <div class="ov-stats">
+            <div><div class="ov-stat-label">Orders</div><div class="ov-stat-val">28</div></div>
+            <div><div class="ov-stat-label">Units</div><div class="ov-stat-val">49</div></div>
+            <div><div class="ov-stat-label">Visitors</div><div class="ov-stat-val">960</div></div>
+            <div><div class="ov-stat-label">Dwell</div><div class="ov-stat-val">56s</div></div>
+            <div><div class="ov-stat-label">AOV</div><div class="ov-stat-val">$404.18</div></div>
+            <div><div class="ov-stat-label">Sales/Vis</div><div class="ov-stat-val">$11.79</div></div>
           </div>
-        ))}
-      </div>
-
-      {/* Tabs */}
-      <div style={{ background: C.surf2, borderBottom: "1px solid " + C.border, padding: "12px 28px", display: "flex", gap: 8 }}>
-        {["OVERVIEW", "METRICS", "PAGES"].map((t) => (
-          <button key={t} onClick={() => setTab(t)} style={{
-            background: tab === t ? C.header : "transparent",
-            color: tab === t ? "#FFFFFF" : C.muted,
-            border: "1px solid " + (tab === t ? C.header : C.border),
-            cursor: "pointer", padding: "7px 22px", fontSize: 11,
-            borderRadius: 3, fontFamily: mono, letterSpacing: "0.1em",
-            fontWeight: tab === t ? 600 : 400,
-          }}>{t}</button>
-        ))}
-      </div>
-
-      {/* Content */}
-      <div style={{ padding: "24px 28px", maxWidth: 1200, margin: "0 auto" }}>
-
-        {/* OVERVIEW */}
-        {tab === "OVERVIEW" && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
-            {phases.map((p, i) => (
-              <div key={p.id} style={{ background: C.surface, border: "1px solid " + C.border, borderRadius: 4, overflow: "hidden" }}>
-                <div style={{ background: C.surf2, padding: "12px 16px", borderBottom: "1px solid " + C.border }}>
-                  <div style={{ fontSize: 10, color: C.gold, fontFamily: mono, letterSpacing: "0.15em" }}>{p.tag}</div>
-                  <div style={{ fontSize: 15, fontWeight: 600, marginTop: 2 }}>{p.subtitle}</div>
-                  <div style={{ fontSize: 11, color: C.muted }}>{p.label}</div>
-                </div>
-                <div style={{ padding: "16px" }}>
-                  <div style={{ fontSize: 30, fontFamily: serif, fontWeight: 400 }}>${p.sales.toLocaleString()}</div>
-                  <div style={{ fontSize: 11, color: C.muted, fontFamily: mono, marginBottom: 14 }}>${p.dailySales.toLocaleString()} / day avg</div>
-                  <div style={{ background: C.surf2, borderRadius: 2, height: 4, marginBottom: 4 }}>
-                    <div style={{ width: ((p.dailySales / maxDaily) * 100) + "%", height: "100%", background: bc(i), borderRadius: 2 }} />
-                  </div>
-                  <div style={{ fontSize: 10, color: C.dim, fontFamily: mono, marginBottom: 16 }}>daily revenue vs peak</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 0" }}>
-                    {[["Orders", p.orders], ["Units", p.units], ["Visitors", p.visitors.toLocaleString()], ["Dwell", p.dwellTime], ["AOV", "$" + p.aov.toFixed(2)], ["Sales/Vis", "$" + p.salesPerVisitor.toFixed(2)]].map(([lbl, val]) => (
-                      <div key={lbl}>
-                        <div style={{ fontSize: 9, color: C.dim, textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: mono }}>{lbl}</div>
-                        <div style={{ fontSize: 14, fontWeight: 500 }}>{val}</div>
-                      </div>
-                    ))}
-                  </div>
-                  {p.delta && (
-                    <div style={{ marginTop: 14, background: "#F0E8DC", border: "1px solid " + C.border, borderRadius: 3, padding: "5px 10px", fontSize: 11, color: C.brown, fontFamily: mono }}>
-                      ▲ {p.delta}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* METRICS */}
-        {tab === "METRICS" && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            {metrics.map((m) => {
-              const max = Math.max(...phases.map((d) => d[m.key]));
-              return (
-                <div key={m.key} style={{ background: C.surface, border: "1px solid " + C.border, borderRadius: 4, padding: "20px" }}>
-                  <div style={{ fontSize: 10, color: C.gold, fontFamily: mono, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 16, borderBottom: "1px solid " + C.border, paddingBottom: 10 }}>
-                    {m.label}
-                  </div>
-                  {phases.map((p, i) => (
-                    <div key={p.id} style={{ marginBottom: 16 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                        <span style={{ fontSize: 12, color: C.muted, fontFamily: mono }}>{p.id} · {p.subtitle}</span>
-                        <span style={{ fontSize: 14, fontWeight: 600 }}>{m.fmt(p[m.key])}</span>
-                      </div>
-                      <div style={{ background: C.surf2, borderRadius: 2, height: 6 }}>
-                        <div style={{ width: ((p[m.key] / max) * 100) + "%", height: "100%", background: bc(i), borderRadius: 2 }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* PAGES */}
-        {tab === "PAGES" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-            {phases.map((p, i) => {
-              const maxS = Math.max(...p.topPages.map((pg) => pg.sales), 1);
-              return (
-                <div key={p.id} style={{ background: C.surface, border: "1px solid " + C.border, borderRadius: 4, overflow: "hidden" }}>
-                  <div style={{ background: C.surf2, padding: "13px 20px", borderBottom: "1px solid " + C.border, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div>
-                      <div style={{ fontSize: 10, color: C.gold, fontFamily: mono, letterSpacing: "0.15em" }}>{p.tag}</div>
-                      <div style={{ fontSize: 15, fontWeight: 600, marginTop: 2 }}>
-                        {p.subtitle} <span style={{ fontWeight: 400, color: C.muted, fontSize: 13 }}>· {p.label}</span>
-                      </div>
-                    </div>
-                    <div style={{ display: "flex", gap: 28 }}>
-                      {[["Total Sales", "$" + p.sales.toLocaleString()], ["AOV", "$" + p.aov.toFixed(2)], ["Views/Visitor", p.viewsPerVisitor.toFixed(2)], ["Units/Order", p.unitsPerOrder.toFixed(2)]].map(([lbl, val]) => (
-                        <div key={lbl} style={{ textAlign: "right" }}>
-                          <div style={{ fontSize: 9, color: C.dim, fontFamily: mono, letterSpacing: "0.12em", textTransform: "uppercase" }}>{lbl}</div>
-                          <div style={{ fontSize: 15, fontWeight: 600 }}>{val}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr 1fr", gap: 8, padding: "10px 20px 6px", borderBottom: "1px solid " + C.border, background: "#FAF7F2" }}>
-                    {["Page", "Sales", "Orders", "Visits", "Views", "Avg Dwell"].map((h) => (
-                      <div key={h} style={{ fontSize: 9, color: C.dim, fontFamily: mono, letterSpacing: "0.12em", textTransform: "uppercase" }}>{h}</div>
-                    ))}
-                  </div>
-                  <div style={{ padding: "0 20px 4px" }}>
-                    {p.topPages.map((pg, ri) => (
-                      <div key={pg.name} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr 1fr", gap: 8, padding: "9px 0", borderBottom: ri < p.topPages.length - 1 ? "1px solid " + C.border : "none", alignItems: "center" }}>
-                        <div>
-                          <div style={{ fontSize: 13, fontWeight: pg.sales > 0 ? 500 : 400, color: pg.sales > 0 ? C.text : C.dim }}>{pg.name}</div>
-                          {pg.sales > 0 && (
-                            <div style={{ background: C.surf2, borderRadius: 2, height: 3, marginTop: 4, width: "80%" }}>
-                              <div style={{ width: ((pg.sales / maxS) * 100) + "%", height: "100%", background: bc(i), borderRadius: 2 }} />
-                            </div>
-                          )}
-                        </div>
-                        <div style={{ fontSize: 13, color: pg.sales > 0 ? C.text : C.dim, fontFamily: mono }}>{pg.sales > 0 ? "$" + pg.sales.toLocaleString() : "—"}</div>
-                        <div style={{ fontSize: 13, color: pg.orders > 0 ? C.text : C.dim, fontFamily: mono }}>{pg.orders > 0 ? pg.orders : "—"}</div>
-                        <div style={{ fontSize: 13, color: pg.visits > 0 ? C.text : C.dim, fontFamily: mono }}>{pg.visits > 0 ? pg.visits.toLocaleString() : "—"}</div>
-                        <div style={{ fontSize: 13, color: pg.views > 0 ? C.text : C.dim, fontFamily: mono }}>{pg.views > 0 ? pg.views.toLocaleString() : "—"}</div>
-                        <div style={{ fontSize: 13, color: C.text, fontFamily: mono }}>{pg.dwell}</div>
-                      </div>
-                    ))}
-                  </div>
-                  {p.id === "P3" && (
-                    <div style={{ background: "#F0E8DC", borderTop: "1px solid " + C.border, padding: "9px 20px", display: "flex", gap: 32, flexWrap: "wrap" }}>
-                      {["Home: 49% of revenue (vs 100% in P1-P2)", "6 pages converting vs 1 in baseline", "Views/visitor: 2.94x vs 1.52x in P1"].map((s) => (
-                        <span key={s} style={{ fontSize: 11, color: C.brown, fontFamily: mono }}>▲ {s}</span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Footer */}
-      <div style={{ borderTop: "1px solid " + C.border, padding: "12px 28px", display: "flex", justifyContent: "space-between", fontSize: 10, color: C.dim, fontFamily: mono }}>
-        <span>MOCKINGBIRD · BRAND STORE PERFORMANCE · Q1 2026</span>
-        <span>FCW AGENCY · AMAZON SELLER CENTRAL DATA</span>
+          <div class="ov-delta">▲ 6.5x daily rev vs P1</div>
+        </div>
       </div>
     </div>
-  );
+  </div>
+
+  <!-- METRICS TAB -->
+  <div id="tab-METRICS" class="tp">
+    <div class="met-grid">
+      <!-- Daily Revenue -->
+      <div class="met-card">
+        <div class="met-title">Daily Revenue</div>
+        <div class="met-row">
+          <div class="met-row-top">
+            <span class="met-label">P1 · Stroller 2.0</span>
+            <span class="met-val">$434</span>
+          </div>
+          <div class="met-bar"><div class="met-bar-fill" style="width:14.93%;background:#C4AD8F"></div></div>
+        </div>
+        <div class="met-row">
+          <div class="met-row-top">
+            <span class="met-label">P2 · Stroller 3.0 + Accessories Launch</span>
+            <span class="met-val">$2,907</span>
+          </div>
+          <div class="met-bar"><div class="met-bar-fill" style="width:100%;background:#8BA8BE"></div></div>
+        </div>
+        <div class="met-row">
+          <div class="met-row-top">
+            <span class="met-label">P3 · Full Store Build-Out</span>
+            <span class="met-val">$2,829</span>
+          </div>
+          <div class="met-bar"><div class="met-bar-fill" style="width:97.32%;background:#8B6F52"></div></div>
+        </div>
+      </div>
+      <!-- Sales / Visitor -->
+      <div class="met-card">
+        <div class="met-title">Sales / Visitor</div>
+        <div class="met-row">
+          <div class="met-row-top">
+            <span class="met-label">P1 · Stroller 2.0</span>
+            <span class="met-val">$4.26</span>
+          </div>
+          <div class="met-bar"><div class="met-bar-fill" style="width:22.19%;background:#C4AD8F"></div></div>
+        </div>
+        <div class="met-row">
+          <div class="met-row-top">
+            <span class="met-label">P2 · Stroller 3.0 + Accessories Launch</span>
+            <span class="met-val">$19.20</span>
+          </div>
+          <div class="met-bar"><div class="met-bar-fill" style="width:100%;background:#8BA8BE"></div></div>
+        </div>
+        <div class="met-row">
+          <div class="met-row-top">
+            <span class="met-label">P3 · Full Store Build-Out</span>
+            <span class="met-val">$11.79</span>
+          </div>
+          <div class="met-bar"><div class="met-bar-fill" style="width:61.41%;background:#8B6F52"></div></div>
+        </div>
+      </div>
+      <!-- AOV -->
+      <div class="met-card">
+        <div class="met-title">AOV (Sales/Order)</div>
+        <div class="met-row">
+          <div class="met-row-top">
+            <span class="met-label">P1 · Stroller 2.0</span>
+            <span class="met-val">$427.44</span>
+          </div>
+          <div class="met-bar"><div class="met-bar-fill" style="width:100%;background:#C4AD8F"></div></div>
+        </div>
+        <div class="met-row">
+          <div class="met-row-top">
+            <span class="met-label">P2 · Stroller 3.0 + Accessories Launch</span>
+            <span class="met-val">$382.50</span>
+          </div>
+          <div class="met-bar"><div class="met-bar-fill" style="width:89.48%;background:#8BA8BE"></div></div>
+        </div>
+        <div class="met-row">
+          <div class="met-row-top">
+            <span class="met-label">P3 · Full Store Build-Out</span>
+            <span class="met-val">$404.18</span>
+          </div>
+          <div class="met-bar"><div class="met-bar-fill" style="width:94.56%;background:#8B6F52"></div></div>
+        </div>
+      </div>
+      <!-- Views / Visitor -->
+      <div class="met-card">
+        <div class="met-title">Views / Visitor</div>
+        <div class="met-row">
+          <div class="met-row-top">
+            <span class="met-label">P1 · Stroller 2.0</span>
+            <span class="met-val">1.52</span>
+          </div>
+          <div class="met-bar"><div class="met-bar-fill" style="width:51.70%;background:#C4AD8F"></div></div>
+        </div>
+        <div class="met-row">
+          <div class="met-row-top">
+            <span class="met-label">P2 · Stroller 3.0 + Accessories Launch</span>
+            <span class="met-val">1.48</span>
+          </div>
+          <div class="met-bar"><div class="met-bar-fill" style="width:50.34%;background:#8BA8BE"></div></div>
+        </div>
+        <div class="met-row">
+          <div class="met-row-top">
+            <span class="met-label">P3 · Full Store Build-Out</span>
+            <span class="met-val">2.94</span>
+          </div>
+          <div class="met-bar"><div class="met-bar-fill" style="width:100%;background:#8B6F52"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGES TAB -->
+  <div id="tab-PAGES" class="tp">
+
+    <!-- P1 Pages -->
+    <div class="pg-card">
+      <div class="pg-head">
+        <div class="pg-head-left">
+          <div class="ov-tag">PHASE 1 · 60 DAYS</div>
+          <div class="ov-name">Stroller 2.0 <span>· Jan 1 – Mar 1</span></div>
+        </div>
+        <div class="pg-stats">
+          <div class="pg-stat"><div class="pg-stat-label">Total Sales</div><div class="pg-stat-val">$26,074</div></div>
+          <div class="pg-stat"><div class="pg-stat-label">AOV</div><div class="pg-stat-val">$427.44</div></div>
+          <div class="pg-stat"><div class="pg-stat-label">Views/Visitor</div><div class="pg-stat-val">1.52</div></div>
+          <div class="pg-stat"><div class="pg-stat-label">Units/Order</div><div class="pg-stat-val">1.05</div></div>
+        </div>
+      </div>
+      <div class="pg-th">
+        <span>Page</span><span>Sales</span><span>Orders</span><span>Visits</span><span>Views</span><span>Avg Dwell</span>
+      </div>
+      <div class="pg-rows">
+        <div class="pg-row">
+          <div>
+            <div class="pg-row-name has-sales">Home</div>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:100%;background:#C4AD8F"></div></div>
+          </div>
+          <div class="pg-cell active">$26,074</div>
+          <div class="pg-cell active">61</div>
+          <div class="pg-cell active">7,442</div>
+          <div class="pg-cell active">9,316</div>
+          <div class="pg-cell active">40s</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P2 Pages -->
+    <div class="pg-card">
+      <div class="pg-head">
+        <div class="pg-head-left">
+          <div class="ov-tag">PHASE 2 · 5 DAYS</div>
+          <div class="ov-name">Stroller 3.0 + Accessories Launch <span>· Mar 2 – Mar 6</span></div>
+        </div>
+        <div class="pg-stats">
+          <div class="pg-stat"><div class="pg-stat-label">Total Sales</div><div class="pg-stat-val">$14,535</div></div>
+          <div class="pg-stat"><div class="pg-stat-label">AOV</div><div class="pg-stat-val">$382.50</div></div>
+          <div class="pg-stat"><div class="pg-stat-label">Views/Visitor</div><div class="pg-stat-val">1.48</div></div>
+          <div class="pg-stat"><div class="pg-stat-label">Units/Order</div><div class="pg-stat-val">1.39</div></div>
+        </div>
+      </div>
+      <div class="pg-th">
+        <span>Page</span><span>Sales</span><span>Orders</span><span>Visits</span><span>Views</span><span>Avg Dwell</span>
+      </div>
+      <div class="pg-rows">
+        <div class="pg-row">
+          <div>
+            <div class="pg-row-name has-sales">Home</div>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:100%;background:#8BA8BE"></div></div>
+          </div>
+          <div class="pg-cell active">$14,375</div>
+          <div class="pg-cell active">37</div>
+          <div class="pg-cell active">945</div>
+          <div class="pg-cell active">1,091</div>
+          <div class="pg-cell active">56s</div>
+        </div>
+        <div class="pg-row">
+          <div>
+            <div class="pg-row-name has-sales">Bassinet</div>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:1.11%;background:#8BA8BE"></div></div>
+          </div>
+          <div class="pg-cell active">$160</div>
+          <div class="pg-cell active">1</div>
+          <div class="pg-cell active">3</div>
+          <div class="pg-cell active">3</div>
+          <div class="pg-cell active">40s</div>
+        </div>
+        <div class="pg-row">
+          <div><div class="pg-row-name no-sales">The Stroller</div></div>
+          <div class="pg-cell inactive">—</div>
+          <div class="pg-cell inactive">—</div>
+          <div class="pg-cell active">3</div>
+          <div class="pg-cell active">3</div>
+          <div class="pg-cell active">70s</div>
+        </div>
+        <div class="pg-row">
+          <div><div class="pg-row-name no-sales">2nd Seat Attach.</div></div>
+          <div class="pg-cell inactive">—</div>
+          <div class="pg-cell inactive">—</div>
+          <div class="pg-cell active">4</div>
+          <div class="pg-cell active">5</div>
+          <div class="pg-cell active">53s</div>
+        </div>
+        <div class="pg-row">
+          <div><div class="pg-row-name no-sales">Car Seat Adapter</div></div>
+          <div class="pg-cell inactive">—</div>
+          <div class="pg-cell inactive">—</div>
+          <div class="pg-cell active">7</div>
+          <div class="pg-cell active">7</div>
+          <div class="pg-cell active">123s</div>
+        </div>
+        <div class="pg-row">
+          <div><div class="pg-row-name no-sales">Shop All</div></div>
+          <div class="pg-cell inactive">—</div>
+          <div class="pg-cell inactive">—</div>
+          <div class="pg-cell active">5</div>
+          <div class="pg-cell active">8</div>
+          <div class="pg-cell active">99s</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P3 Pages -->
+    <div class="pg-card">
+      <div class="pg-head">
+        <div class="pg-head-left">
+          <div class="ov-tag">PHASE 3 · 4 DAYS</div>
+          <div class="ov-name">Full Store Build-Out <span>· Mar 7 – Mar 10</span></div>
+        </div>
+        <div class="pg-stats">
+          <div class="pg-stat"><div class="pg-stat-label">Total Sales</div><div class="pg-stat-val">$11,317</div></div>
+          <div class="pg-stat"><div class="pg-stat-label">AOV</div><div class="pg-stat-val">$404.18</div></div>
+          <div class="pg-stat"><div class="pg-stat-label">Views/Visitor</div><div class="pg-stat-val">2.94</div></div>
+          <div class="pg-stat"><div class="pg-stat-label">Units/Order</div><div class="pg-stat-val">1.75</div></div>
+        </div>
+      </div>
+      <div class="pg-th">
+        <span>Page</span><span>Sales</span><span>Orders</span><span>Visits</span><span>Views</span><span>Avg Dwell</span>
+      </div>
+      <div class="pg-rows">
+        <div class="pg-row">
+          <div>
+            <div class="pg-row-name has-sales">Home</div>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:100%;background:#8B6F52"></div></div>
+          </div>
+          <div class="pg-cell active">$5,598</div>
+          <div class="pg-cell active">8</div>
+          <div class="pg-cell active">1,220</div>
+          <div class="pg-cell active">1,290</div>
+          <div class="pg-cell active">48s</div>
+        </div>
+        <div class="pg-row">
+          <div>
+            <div class="pg-row-name has-sales">Shop All</div>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:39.87%;background:#8B6F52"></div></div>
+          </div>
+          <div class="pg-cell active">$2,232</div>
+          <div class="pg-cell active">6</div>
+          <div class="pg-cell active">341</div>
+          <div class="pg-cell active">382</div>
+          <div class="pg-cell active">30s</div>
+        </div>
+        <div class="pg-row">
+          <div>
+            <div class="pg-row-name has-sales">The Stroller</div>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:29.42%;background:#8B6F52"></div></div>
+          </div>
+          <div class="pg-cell active">$1,647</div>
+          <div class="pg-cell active">2</div>
+          <div class="pg-cell active">299</div>
+          <div class="pg-cell active">326</div>
+          <div class="pg-cell active">44s</div>
+        </div>
+        <div class="pg-row">
+          <div>
+            <div class="pg-row-name has-sales">2nd Seat Attach.</div>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:18.76%;background:#8B6F52"></div></div>
+          </div>
+          <div class="pg-cell active">$1,050</div>
+          <div class="pg-cell active">6</div>
+          <div class="pg-cell active">264</div>
+          <div class="pg-cell active">281</div>
+          <div class="pg-cell active">48s</div>
+        </div>
+        <div class="pg-row">
+          <div>
+            <div class="pg-row-name has-sales">Bassinet</div>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:11.43%;background:#8B6F52"></div></div>
+          </div>
+          <div class="pg-cell active">$640</div>
+          <div class="pg-cell active">3</div>
+          <div class="pg-cell active">255</div>
+          <div class="pg-cell active">276</div>
+          <div class="pg-cell active">31s</div>
+        </div>
+        <div class="pg-row">
+          <div>
+            <div class="pg-row-name has-sales">Car Seat Adapter</div>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:2.68%;background:#8B6F52"></div></div>
+          </div>
+          <div class="pg-cell active">$150</div>
+          <div class="pg-cell active">3</div>
+          <div class="pg-cell active">258</div>
+          <div class="pg-cell active">271</div>
+          <div class="pg-cell active">42s</div>
+        </div>
+      </div>
+      <div class="pg-footer">
+        <span>▲ Home: 49% of revenue (vs 100% in P1-P2)</span>
+        <span>▲ 6 pages converting vs 1 in baseline</span>
+        <span>▲ Views/visitor: 2.94x vs 1.52x in P1</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <span>MOCKINGBIRD · BRAND STORE PERFORMANCE · Q1 2026</span>
+  <span>FCW AGENCY · AMAZON SELLER CENTRAL DATA</span>
+</div>
+
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.tp').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelectorAll('.tbtn').forEach(function(el) { el.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('.tbtn').forEach(function(el) {
+    if (el.textContent === name) el.classList.add('active');
+  });
 }
+</script>
+
+</body>
+</html>
